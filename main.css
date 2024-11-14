@@ -24,7 +24,6 @@ body {
 .field{
     display:flex;
     /* flex-direction:column; */
-<<<<<<< HEAD
 }
 
 .field__column{
@@ -56,8 +55,6 @@ body {
     background-color:#332;
     display:grid;
     grid-template: repeat(32, 1fr)/ repeat(32, 1fr);
-=======
->>>>>>> 5752425 (Change field view generation)
 }
 
 .field-column{
