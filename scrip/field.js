@@ -31,6 +31,10 @@ class Field {
         return field;
     }
 
+    isSet(x, y){
+        return this.isPositionValid(x, y) ? this.fieldData.array[y][x].active : false;
+    }
+
     isActive(x, y) {
         if (this.isPositionValid(x, y)) return this.fieldData.array[y][x].active;
         return false;
@@ -51,7 +55,7 @@ class Field {
 
     isPositionValid(x, y) {
         let size = this.fieldData.array.length;
-        if (x > 0 && y > 0 && x < size & y < size) {
+        if (x >= 0 && y >= 0 && x < size & y < size) {
             return true;
         }
         return false;

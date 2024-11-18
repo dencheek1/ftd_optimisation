@@ -54,7 +54,6 @@ body {
 .button:hover{
     background-color:#332;
     display:grid;
-    grid-template: repeat(32, 1fr)/ repeat(32, 1fr);
 }
 
 .field-column{

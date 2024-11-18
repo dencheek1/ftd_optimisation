@@ -1,4 +1,4 @@
-import Field  from './field.js'
+import Field from './field.js'
 
 function drawEvent(e) {
     if ((e.buttons & 1) == true)
@@ -32,6 +32,29 @@ function generateField(size) {
     fieldView.setAttribute('onDragStart', 'return false;')
 }
 
+function generateViewNode(field) {
+    const node = document.createElement('div');
+    node.setAttribute('class', 'field')
+    for (let xIndex = 0; xIndex < field.fieldData.array.length; xIndex++) {
+
+        let column = document.createElement('div');
+        column.setAttribute('class', "field__column")
+        for (let yIndex = 0; yIndex < field.fieldData.array.length; yIndex++) {
+
+            let cell = document.createElement('div');
+            cell.setAttribute('class', 'field__cell');
+            cell.setAttribute('x', xIndex);
+            cell.setAttribute('y', yIndex);
+            if( !field.isActive(xIndex, yIndex) ) cell.setAttribute('disabled', '');
+            if( !field.isSet(xIndex, yIndex) ) cell.setAttribute('active', ''); 
+            column.appendChild(cell);
+        }
+        node.appendChild(column);
+    }
+
+    return node;
+}
+
 function clickDraw(e) {
     if (e.button == 0)
         e.target.setAttribute('disabled', '');
@@ -44,10 +67,17 @@ function resetField() {
     // field.textContent = '';
 }
 
-function searchField(){
+function searchField() {
     const field = document.getElementById('field');
     let f = Field.fieldFromView(field);
     console.log(f.toString());
+    // let view = generateViewNode(f);
+    // const result = document.getElementsByClassName('results')[0];
+    // if(result) {
+    //     result.textContent = ''
+    //     result.appendChild(view);
+    
+    // }
 }
 
 const reset = document.getElementsByClassName('input__reset-button')[0];
