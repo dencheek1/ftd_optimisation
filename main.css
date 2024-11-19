@@ -16,8 +16,6 @@ body {
 .inputs,
 .results {
     background: gray;
-    width:300px;
-    height:300px;
 }
 
 
@@ -36,8 +34,9 @@ body {
 
 .field__cell{
     background: #f00;
-    height: 25px;
-    width:25px;
+    height: 15px;
+    width:15px;
+border: 1px solid #0001
 }
 
 .field__cell[active]{
@@ -45,7 +44,7 @@ body {
 }
 
 .field__cell[disabled]{
-    background-color: black;
+    background-color: #0000;
 }
 
 
@@ -58,7 +57,6 @@ body {
 
 .button:hover{
     background-color:#332;
-    display:grid;
 }
 
 .field-column{
@@ -73,4 +71,8 @@ body {
     background: #f00;
     height: 25px;
     width:25px;
+}
+
+.row{
+    display:flex;
 }

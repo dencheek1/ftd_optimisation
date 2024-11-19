@@ -1,6 +1,8 @@
 import Field from './field.js';
 import { GASearch, GAInstance } from './search.js';
 
+const fieldView = document.getElementById('field');
+
 function drawEvent(e) {
     if ((e.buttons & 1) == true)
         e.target.setAttribute('disabled', '');
@@ -11,7 +13,6 @@ function drawEvent(e) {
 function generateField(size) {
     //TODO reverse dependencie, create data model based on field view 
     // * would be nice to have methods for two ways
-    const fieldView = document.getElementById('field');
     for (let xIndex = 0; xIndex < size; xIndex++) {
 
         let column = document.createElement('div');
@@ -46,8 +47,8 @@ function generateViewNode(field) {
             cell.setAttribute('class', 'field__cell');
             cell.setAttribute('x', xIndex);
             cell.setAttribute('y', yIndex);
-            if( !field.isActive(xIndex, yIndex) ) cell.setAttribute('disabled', '');
-            if( field.isSet(xIndex, yIndex) ) cell.setAttribute('active', ''); 
+            if (!field.isActive(xIndex, yIndex)) cell.setAttribute('disabled', '');
+            if (field.isSet(xIndex, yIndex)) cell.setAttribute('active', '');
             column.appendChild(cell);
         }
         node.appendChild(column);
@@ -63,35 +64,33 @@ function clickDraw(e) {
 }
 
 function resetField() {
-    const field = document.getElementById('field');
-    field.childNodes.forEach(fc => fc.childNodes.forEach(c => c.removeAttribute('disabled')));
+    fieldView.childNodes.forEach(fc => fc.childNodes.forEach(c => c.removeAttribute('disabled')));
     // field.textContent = '';
 }
 
 function searchField() {
-    const field = document.getElementById('field');
-    let f = Field.fieldFromView(field);
+    let f = Field.fieldFromView(fieldView);
 
     let gaInstance = new GAInstance(f);
-    console.log(gaInstance.toString())
     let population = GASearch.findSolution(gaInstance);
     // console.log(breed.toString());
+    if (window.Worker) {
+
+    }
     let view = generateViewNode(population[0]);
     const result = document.getElementsByClassName('results')[0];
-    if(result) {
+    if (result) {
         result.textContent = ''
         result.appendChild(view);
-        console.log(population[0].toString() + ' ' + population[0].score());
-    
+
     }
-     population = GASearch.findSolution(population[0]);
+    population = GASearch.findSolution(population[0]);
     // console.log(breed.toString());
-     view = generateViewNode(population[0]);
-    if(result) {
+    view = generateViewNode(population[0]);
+    if (result) {
         result.textContent = ''
         result.appendChild(view);
         console.log(population[0].toString() + ' ' + population[0].score());
-    
     }
 }
 
@@ -99,5 +98,14 @@ const reset = document.getElementsByClassName('input__reset-button')[0];
 if (reset) reset.addEventListener('mouseup', resetField);
 const search = document.getElementsByClassName('input__search-button')[0];
 if (search) search.addEventListener('mouseup', searchField);
+
+const size = document.getElementById('range');
+
+size.addEventListener('change', (e) => {
+    if (e.target.value) {
+        fieldView.textContent = '';
+        generateField(e.target.value);
+    }
+})
 
 export { drawEvent, generateField };

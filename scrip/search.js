@@ -55,9 +55,11 @@ class GAInstance extends Field {
         return this.fieldData.array.reduce((acc, ell, y) => {
             return acc + (ell.reduce((ac, cell, x) => {
                 return ac + (cell.active
-                    ? cell.state
-                        ? 1
-                        : this.hasSetNeighbor(x, y)
+                    ? this.hasSetNeighbor(x, y)
+                        ? cell.state
+                            ? 1 
+                            : 3
+                        : cell.state
                             ? 2
                             : -1
                     : 0
@@ -84,11 +86,6 @@ class GASearch {
 
     static updatePopulation(best, second, last) {
         let population = [];
-        // population.push(best.clone());
-        // population.push(second.clone());
-        // population.push(last.clone());
-        //breed 
-        //mutate others
         for (let i = 5; i > 0; i--) {
             population.push(best.clone());
             population.push(second.clone());
@@ -100,7 +97,6 @@ class GASearch {
         for (let i = 0; i < population.length; i += 3) {
             population[i] = population[i].mutate();
         }
-        console.log(population.length);
         return population;
     }
 
@@ -111,6 +107,7 @@ class GASearch {
     }
 
     static findSolution(instance) {
+        console.log(instance.score())
         let population = this.generatePopulation(instance);
         let size = population[0].fieldData.array.length;
         for (let i = size * size * 2; i > 0; i--) {
