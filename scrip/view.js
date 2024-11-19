@@ -1,4 +1,5 @@
-import Field from './field.js'
+import Field from './field.js';
+import { GASearch, GAInstance } from './search.js';
 
 function drawEvent(e) {
     if ((e.buttons & 1) == true)
@@ -70,14 +71,18 @@ function resetField() {
 function searchField() {
     const field = document.getElementById('field');
     let f = Field.fieldFromView(field);
-    console.log(f.toString());
-    // let view = generateViewNode(f);
-    // const result = document.getElementsByClassName('results')[0];
-    // if(result) {
-    //     result.textContent = ''
-    //     result.appendChild(view);
+
+    let gaInstance = new GAInstance(f);
+    console.log(gaInstance.toString())
+    let population = GASearch.findSolution(gaInstance);
+    // console.log(breed.toString());
+    let view = generateViewNode(population[0]);
+    const result = document.getElementsByClassName('results')[0];
+    if(result) {
+        result.textContent = ''
+        result.appendChild(view);
     
-    // }
+    }
 }
 
 const reset = document.getElementsByClassName('input__reset-button')[0];
