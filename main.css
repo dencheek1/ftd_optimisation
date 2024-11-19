@@ -40,9 +40,14 @@ body {
     width:25px;
 }
 
+.field__cell[active]{
+    background-color:green;
+}
+
 .field__cell[disabled]{
     background-color: black;
 }
+
 
 .button{
     color:white;
