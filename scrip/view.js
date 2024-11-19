@@ -47,7 +47,7 @@ function generateViewNode(field) {
             cell.setAttribute('x', xIndex);
             cell.setAttribute('y', yIndex);
             if( !field.isActive(xIndex, yIndex) ) cell.setAttribute('disabled', '');
-            if( !field.isSet(xIndex, yIndex) ) cell.setAttribute('active', ''); 
+            if( field.isSet(xIndex, yIndex) ) cell.setAttribute('active', ''); 
             column.appendChild(cell);
         }
         node.appendChild(column);
@@ -81,6 +81,16 @@ function searchField() {
     if(result) {
         result.textContent = ''
         result.appendChild(view);
+        console.log(population[0].toString() + ' ' + population[0].score());
+    
+    }
+     population = GASearch.findSolution(population[0]);
+    // console.log(breed.toString());
+     view = generateViewNode(population[0]);
+    if(result) {
+        result.textContent = ''
+        result.appendChild(view);
+        console.log(population[0].toString() + ' ' + population[0].score());
     
     }
 }

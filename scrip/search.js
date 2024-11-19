@@ -43,6 +43,10 @@ class GAInstance extends Field {
         let clone = this.clone();
         let x = Math.ceil(Math.random() * clone.fieldData.array.length - 1);
         let y = Math.ceil(Math.random() * clone.fieldData.array.length - 1);
+        while (!clone.isActive(x, y)) {
+            x = Math.ceil(Math.random() * clone.fieldData.array.length - 1);
+            y = Math.ceil(Math.random() * clone.fieldData.array.length - 1);
+        }
         clone.toggleCell(x, y);
         return clone;
     }
@@ -101,15 +105,15 @@ class GASearch {
     }
 
     static step(population) {
-        let newPopulation =  this.updatePopulation(population[0], population[1], population[29]);
+        let newPopulation = this.updatePopulation(population[0], population[1], population[29]);
         newPopulation.sort((a, b) => a.score() <= b.score())
-        return newPopulation; 
+        return newPopulation;
     }
 
-    static findSolution(instance){
+    static findSolution(instance) {
         let population = this.generatePopulation(instance);
         let size = population[0].fieldData.array.length;
-        for(let i = size * size; i > 0; i--){
+        for (let i = size * size * 2; i > 0; i--) {
             population = this.step(population);
         }
         return population;
