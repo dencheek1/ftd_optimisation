@@ -7,8 +7,13 @@ import { GAInstance, GASearch } from './search.js';
 
 // generateField(new Field(4));
 
-
-generateField(11);
+const range = document.getElementById('range');
+if (range.value) {
+    generateField(range.value);
+}
+else {
+    generateField(11);
+}
 
 // let f = Field.fieldFromView(document.getElementById('field'));
 // let empty = Field.newEmptyField(f.fieldData.array.length);

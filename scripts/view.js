@@ -77,20 +77,24 @@ function searchField() {
     if (window.Worker) {
 
     }
-    let view = generateViewNode(population[0]);
-    const result = document.getElementsByClassName('results')[0];
-    if (result) {
-        result.textContent = ''
-        result.appendChild(view);
 
-    }
-    population = GASearch.findSolution(population[0]);
     // console.log(breed.toString());
-    view = generateViewNode(population[0]);
-    if (result) {
-        result.textContent = ''
-        result.appendChild(view);
-        console.log(population[0].toString() + ' ' + population[0].score());
+    let best = population[0]
+    let change = 15;
+    const result = document.getElementsByClassName('results')[0];
+    while (change-- > 0) {
+        population = GASearch.findSolution(best);
+        if (best.score() < population[0].score()) {
+            best = population[0];
+            change = 55;
+        }
+
+            console.log(best.toString() + ' ' + best.score());
+        let view = generateViewNode(best);
+        if (result) {
+            result.textContent = ''
+            result.appendChild(view);
+        }
     }
 }
 

@@ -2,8 +2,6 @@
 
 import Field from './field.js'
 //TODO 
-// * implement genetic search algorithm
-// * make steps dependent on field size
 // * something something web workers
 
 class GAInstance extends Field {
@@ -33,9 +31,18 @@ class GAInstance extends Field {
     }
 
     clone() {
-        let data = structuredClone(this.fieldData);
+        let data = [];
+        this.fieldData.array.forEach(element => {
+            let column = [];
+            element.forEach(el => {
+                column.push({ active: el.active, state: el.state })
+            });
+            data.push(column);
+        });
+        // let data = structuredClone(this.fieldData);
         let clone = new GAInstance(this);
-        clone.fieldData = data;
+        clone.fieldData = {array:  data};
+        // clone.fieldData = data;
         return clone;
     }
 
@@ -57,7 +64,7 @@ class GAInstance extends Field {
                 return ac + (cell.active
                     ? this.hasSetNeighbor(x, y)
                         ? cell.state
-                            ? 1 
+                            ? 1
                             : 3
                         : cell.state
                             ? 2
@@ -94,26 +101,39 @@ class GASearch {
             population.push(best.breed(last));
             population.push(second.breed(last));
         }
-        for (let i = 0; i < population.length; i += 3) {
+        for (let i = 0; i < population.length; i += 2) {
             population[i] = population[i].mutate();
         }
         return population;
     }
 
     static step(population) {
-        let newPopulation = this.updatePopulation(population[0], population[1], population[29]);
-        newPopulation.sort((a, b) => a.score() <= b.score())
+        let selected = population.reduce((sl, el) => {
+            if (sl.best.score() < el.score()) {
+                sl.second = sl.best;
+                sl.best = el;
+            }
+            if (sl.last.score() > el.score()) {
+                sl.last = el;
+            }
+            return sl;
+        }
+            , { best: population[0], second: population[0], last: population[0] });
+
+        let newPopulation = this.updatePopulation(selected.best, selected.second, selected.last);
         return newPopulation;
     }
 
     static findSolution(instance) {
-        console.log(instance.score())
         let population = this.generatePopulation(instance);
         let size = population[0].fieldData.array.length;
+
+        console.time('solution cycle');
         for (let i = size * size * 2; i > 0; i--) {
             population = this.step(population);
         }
-        return population;
+        console.timeEnd('solution cycle');
+        return population.sort((a, b) => a.score() < b.score());
     }
 
 }

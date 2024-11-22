@@ -76,3 +76,7 @@ border: 1px solid #0001
 .row{
     display:flex;
 }
+
+.row > *{
+    margin:5px;
+}
