@@ -14,6 +14,24 @@ if (range.value) {
 else {
     generateField(11);
 }
+let field = new Field(5);
+
+// field.makeInactive(3,3);
+// field.toggleCell(0,2);
+// console.log(field.toString())
+// console.log(field.isActive(3,3))
+// field.setState(2,2,false);
+// field.setState(1,2,false);
+// field.toggleCell(0,2);
+// field.makeActive(3,3);
+// console.log(field.toString())
+// console.log(field.isActive(3,3))
+let empty = new GAInstance(Field.newEmptyField(5));
+let instance = new GAInstance(field);
+instance.makeInactive(0, 0);
+instance.makeInactive(1, 0);
+instance.makeInactive(2, 2);
+instance.makeInactive(3, 2);
 
 // let f = Field.fieldFromView(document.getElementById('field'));
 // let empty = Field.newEmptyField(f.fieldData.array.length);

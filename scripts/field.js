@@ -1,17 +1,18 @@
 
 class Field {
     constructor(size) {
-        let field = { array: [] };
+        //check if size < 32;
+        this.size = size;
+        this.fieldActive = [];
+        this.fieldState = [];
         for (let i = 0; i < size; i++) {
-            let column = [];
-            for (let j = 0; j < size; j++) {
-                //create cell
-                column.push({ active: true, state: true })
-            }
-            //push line to field
-            field.array.push(column);
+            let active = -1;
+            // let state = 1108378657;
+            let state = -1;
+            this.fieldActive[i] = active;
+            // this.fieldState[i] = state << (2 * (i ) % 5) ;
+            this.fieldState[i] = state;
         }
-        this.fieldData = field;
     }
 
     static fieldFromView(fieldView) {
@@ -20,74 +21,96 @@ class Field {
         let field = new Field(childNodes.length);
 
         childNodes.forEach(column => column.childNodes.forEach(cell => {
-            if (cell.hasAttribute('disabled')){
+            if (cell.hasAttribute('disabled')) {
                 let x = cell.getAttribute('x');
                 let y = cell.getAttribute('y');
                 field.makeInactive(x, y);
-                field.setState(x,y, false);
-            } 
+                field.setState(x, y, false);
+            }
         }
         ));
         return field;
     }
 
-    static newEmptyField(size){
+    static newEmptyField(size) {
         let field = new Field(size);
 
-        field.fieldData.array.forEach( el => el.forEach( cell => cell.state = false));
-        return field; 
+        for (let i = 0; i < field.size; i++) {
+            field.fieldState[i] = 0;
+        }
+
+        return field;
     }
 
-    isSet(x, y){
-        return this.isPositionValid(x, y) ? this.fieldData.array[y][x].state : false;
+    isSet(x, y) {
+        return this.isPositionValid(x, y) && !!(this.fieldState[y] & 1 << x);
     }
 
     isActive(x, y) {
-        if (this.isPositionValid(x, y)) return this.fieldData.array[y][x].active;
-        return false;
+        return this.isPositionValid(x, y) && !!(this.fieldActive[y] & 1 << x);
+        // if (this.isPositionValid(x, y)) return this.fieldData.array[y][x].active;
+        // return false;
     }
 
     makeActive(x, y) {
-        if (this.isPositionValid(x, y)) this.fieldData.array[y][x].active = false;
+        if (this.isPositionValid(x, y)) {
+            this.fieldActive[y] = this.fieldActive[y] | 1 << y;
+        }
     }
 
     makeInactive(x, y) {
-        if (this.isPositionValid(x, y)) this.fieldData.array[y][x].active = false;
+        // if (this.isPositionValid(x, y)) this.fieldData.array[y][x].active = false;
+        if (this.isPositionValid(x, y)) {
+            this.fieldActive[y] = this.fieldActive[y] & ~(1 << x);
+        }
     }
 
     toggleCell(x, y) {
         if (this.isPositionValid(x, y))
-            this.fieldData.array[y][x].state = !(this.fieldData.array[y][x].state);
+            this.fieldState[y] = this.fieldState[y] ^ (1 << x);
     }
 
-    setState(x,y, state){
-        if (this.isPositionValid(x,y))  this.fieldData.array[y][x].state = state;
+    setState(x, y, state) {
+        if (this.isPositionValid(x, y)) {
+            this.fieldState[y] = this.fieldState[y] & ~(1 << x) | ((!!state) << x);
+        }
     }
 
 
     isPositionValid(x, y) {
-        let size = this.fieldData.array.length;
-        if (x >= 0 && y >= 0 && x < size & y < size) {
+        if (x >= 0 && y >= 0 && x < this.size & y < this.size) {
             return true;
         }
         return false;
     }
 
     toString() {
-        let string = this.fieldData.array.reduce((acc, val) =>
-            acc += val.reduce((iacc, ival) =>
-                iacc += ival.active ? ival.state ? '*' : '0' : ' ',
-                '') + '\n',
-            '')
+        let string = 0;
+
+        for (let i = 0; i < this.size; i++) {
+
+            string += '\n';
+            for (let j = 0; j < this.size; j++) {
+                if ((this.fieldActive[i] & (1 << j)) != 0) string += (this.fieldState[i] & 1 << j) != 0 ? 'o' : ' ';
+                else string += '+';
+            }
+        }
+        // let string = this.fieldData.array.reduce((acc, val) =>
+        //     acc += val.reduce((iacc, ival) =>
+        //         iacc += ival.active ? ival.state ? '*' : '0' : ' ',
+        //         '') + '\n',
+        //     '')
         return string;
     }
 
     getSize() {
-        return this.fieldData.array.length;
+        return this.size;
     }
     //Field data representation?
 
-    getColumn() { }
+    size;
+    fieldState;
+    fieldActive;
     fieldData;
 }
 

@@ -7,8 +7,11 @@ import Field from './field.js'
 class GAInstance extends Field {
     // really bad solution
     constructor(field) {
-        super(field.fieldData.array.length);
-        if (field) this.fieldData = field.fieldData;
+        super(field.size);
+        if (field) {
+            this.fieldActive = field.fieldActive;
+            this.fieldState = field.fieldState;
+        }
     }
 
     hasSetNeighbor(x, y) {
@@ -16,12 +19,10 @@ class GAInstance extends Field {
     }
 
     breed(instance) {
-
+        const mask = 1431655765;
         let clone = this.clone();
-        for (let x = 0; x < clone.fieldData.array.length; x++) {
-            for (let y = x & 1; y < clone.fieldData.array.length; y += 2) {
-                clone.setState(x, y, instance.isSet(x, y));
-            }
+        for (let i = 0; i < clone.size; i++) {
+            clone.fieldState[i] = (this.fieldState[i] & (mask >> ((i + 1) & 1))) | (instance.fieldState[i] & (mask >> ((i) & 1)));
         }
         return clone;
     }
@@ -31,50 +32,74 @@ class GAInstance extends Field {
     }
 
     clone() {
-        let data = [];
-        this.fieldData.array.forEach(element => {
-            let column = [];
-            element.forEach(el => {
-                column.push({ active: el.active, state: el.state })
-            });
-            data.push(column);
-        });
+        let clone = new GAInstance(new Field(this.size));
+        for (let i = 0; i < clone.size; i++) {
+            clone.fieldState[i] = this.fieldState[i];
+            clone.fieldActive[i] = this.fieldActive[i];
+        }
+        // this.fieldData.array.forEach(element => {
+        //     let column = [];
+        //     element.forEach(el => {
+        //         column.push({ active: el.active, state: el.state })
+        //     });
+        //     data.push(column);
+        // });
         // let data = structuredClone(this.fieldData);
-        let clone = new GAInstance(this);
-        clone.fieldData = {array:  data};
+        // clone.fieldData = {array:  data};
         // clone.fieldData = data;
         return clone;
     }
 
     mutate() {
         let clone = this.clone();
-        let x = Math.ceil(Math.random() * clone.fieldData.array.length - 1);
-        let y = Math.ceil(Math.random() * clone.fieldData.array.length - 1);
+        let x = Math.ceil(Math.random() * clone.size - 1);
+        let y = Math.ceil(Math.random() * clone.size - 1);
         while (!clone.isActive(x, y)) {
-            x = Math.ceil(Math.random() * clone.fieldData.array.length - 1);
-            y = Math.ceil(Math.random() * clone.fieldData.array.length - 1);
+            x = Math.ceil(Math.random() * clone.size - 1);
+            y = Math.ceil(Math.random() * clone.size - 1);
         }
         clone.toggleCell(x, y);
         return clone;
     }
 
     score() {
-        return this.fieldData.array.reduce((acc, ell, y) => {
-            return acc + (ell.reduce((ac, cell, x) => {
-                return ac + (cell.active
-                    ? this.hasSetNeighbor(x, y)
-                        ? cell.state
-                            ? 1
-                            : 3
-                        : cell.state
-                            ? 2
-                            : -1
-                    : 0
-                )
+        let score = 0;
+        for (let y = 0; y < this.size; y++) {
+            for (let x = 0; x < this.size; x++) {
+                if (this.isActive(x, y)) {
+                    if (this.isSet(x, y)) {
+                        //check if match pattern
+                        // TODO change for bit operation 
+                        if (
+                            this.isSet(x, y + 2) ||
+                            this.isSet(x, y - 2) ||
+                            this.isSet(x - 1, y + 1) ||
+                            this.isSet(x, y + 1) ||
+                            this.isSet(x + 1, y + 1) ||
+                            this.isSet(x - 1, y - 1) ||
+                            this.isSet(x, y - 1) ||
+                            this.isSet(x + 1, y - 1) ||
+                            this.isSet(x - 2, y) ||
+                            this.isSet(x - 1, y) ||
+                            this.isSet(x + 1, y) ||
+                            this.isSet(x + 2, y)
+                        )
+                            score += 0;
+                        else
+                            score += 1;
+                    }
+                    else {
+                        //check if match pattern
+                        let temp =  this.isSet(x - 1, y) +
+                            this.isSet(x + 1, y) +
+                            this.isSet(x, y - 1) +
+                            this.isSet(x, y + 1)
+                              score += -1 + ( 5 - temp ) % 5;
+                    }
+                }
             }
-                , 0)
-            )
-        }, 0)
+        }
+        return score;
     }
 
 }
@@ -126,7 +151,7 @@ class GASearch {
 
     static findSolution(instance) {
         let population = this.generatePopulation(instance);
-        let size = population[0].fieldData.array.length;
+        let size = population[0].size;
 
         console.time('solution cycle');
         for (let i = size * size * 2; i > 0; i--) {
