@@ -11,18 +11,18 @@
 
 <body>
     <div class="wrapper">
-        <div class="row">
-            <div class="field" id="field"></div>
-            <div class="results"></div>
-        </div>
         <div class="inputs">
             <div class="input__reset-button button">reset</div>
             <div class="input__field-size button">small</div>
             <div class="range">
                 <input type="number" min="4" max="32" value="11" id="range" />
             </div>
-            <div class="input__search-button button">search</div>
+            <div class="input__search-button button" id="search">search</div>
         </div>
+        <div class="row">
+            <div class="field" id="field"></div>
+        </div>
+            <div class="results"></div>
     </div>
     <script type="module" src="scripts/src.js"></script>
 </body>

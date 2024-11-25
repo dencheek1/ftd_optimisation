@@ -14,7 +14,7 @@ if (range.value) {
 else {
     generateField(11);
 }
-let field = new Field(5);
+let field = new Field(6);
 
 // field.makeInactive(3,3);
 // field.toggleCell(0,2);
@@ -26,12 +26,23 @@ let field = new Field(5);
 // field.makeActive(3,3);
 // console.log(field.toString())
 // console.log(field.isActive(3,3))
-let empty = new GAInstance(Field.newEmptyField(5));
+let empty = new GAInstance(Field.newEmptyField(6));
 let instance = new GAInstance(field);
 instance.makeInactive(0, 0);
 instance.makeInactive(1, 0);
 instance.makeInactive(2, 2);
 instance.makeInactive(3, 2);
+console.log(instance.toString())
+instance.optimalPattern(0);
+console.log(instance.toString())
+instance.optimalPattern(1);
+console.log(instance.toString())
+instance.optimalPattern(2);
+console.log(instance.toString())
+instance.optimalPattern(3);
+console.log(instance.toString())
+instance.optimalPattern(4);
+console.log(instance.toString())
 
 // let f = Field.fieldFromView(document.getElementById('field'));
 // let empty = Field.newEmptyField(f.fieldData.array.length);
