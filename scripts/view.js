@@ -93,8 +93,6 @@ function searchField() {
     let f = Field.fieldFromView(fieldView);
 
     let gaInstance = new GAInstance(f);
-    // let population = GASearch.findSolution(gaInstance);
-    // console.log(breed.toString());
 
     let best = gaInstance; //population[0]
     let change = 0;
@@ -112,10 +110,6 @@ function searchField() {
         result.appendChild(view);
       }
     }
-    // population.forEach(best =>
-
-    //     console.log(best.toString() + ' ' + best.score())
-    // )
     if (window.Worker) {
       console.log(best.toString());
       // console.log(new GAInstance(f))
@@ -133,7 +127,9 @@ function searchField() {
         console.log(best.score());
         console.log(counter);
         if (flag) {
-          if (counter % 5 == 0) {
+          if (counter % 2 == 0) {
+            worker.postMessage(gaInstance);
+          } else if (counter % 5 == 0) {
             let pattern = gaInstance.clone();
             pattern.optimalPattern(counter / 5);
             worker.postMessage(pattern);
@@ -142,6 +138,9 @@ function searchField() {
       };
       worker.onerror = (e) => console.log(e.message);
     }
+  }
+  else{
+    counter = 0;
   }
 }
 

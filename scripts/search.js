@@ -101,14 +101,9 @@ class GAInstance extends Field {
             //     (this.isSet(x, y + 1) || this.isSet(x, y + 2));
             //   score += 4 - temp;
             // }
-            score += 0;
+            score += 1;
             // else
-          } else if (
-            this.isSet(x - 1, y) ||
-            this.isSet(x + 1, y) ||
-            this.isSet(x, y - 1) ||
-            this.isSet(x, y + 1)
-          ) {
+          } else if (this.hasSetNeighbor(x, y)) {
             //check if match pattern
             // let temp =
             //   this.isSet(x - 1, y) +
@@ -150,7 +145,7 @@ class GASearch {
   static updatePopulation(best, second, last, mutationRate) {
     let population = [];
 
-    for (let i = 6; i > 0; i--) {
+    for (let i = 5; i > 0; i--) {
       population.push(best.clone());
       population.push(second.clone());
       population.push(last.clone());
@@ -160,14 +155,14 @@ class GASearch {
     }
     let size = population.length;
     for (let i = 0; i < size - 6; i++) {
-      for (let m = 0; m < mutationRate; m++) {
+      for (let m = 0; m < mutationRate + i / 6; m++) {
         population[i] = population[i].mutate();
       }
     }
 
-    for(let i = 0; i < size / 5; i++){
-      population[i] = population[i].breed(population[i + 6])
-    }
+    // for(let i = 0; i < size / 5; i++){
+    //   population[i] = population[i].breed(population[i + 6])
+    // }
     // for (let i = 0; i < population.length; i += 4) {
     //   population[i] = population[i].mutate();
     // }
@@ -204,7 +199,7 @@ class GASearch {
     let size = population[0].size;
 
     console.time("solution cycle");
-    for (let i = size * size * 3; i > 0; i--) {
+    for (let i = size * size * 2; i > 0; i--) {
       population = this.step(population, mutationRate);
     }
     console.timeEnd("solution cycle");

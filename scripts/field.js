@@ -14,19 +14,19 @@ class Field {
     }
   }
 
-  optimalPattern(offset){
-      let state = 1108378657;
+  optimalPattern(offset) {
+    let state = 1108378657;
     for (let i = 0; i < this.size; i++) {
-      this.fieldState[i] = state << (2 * (i + (offset % 5) ) % 5) ;
+      this.fieldState[i] = state << (2 * (i + (offset % 5))) % 5;
     }
   }
 
   hasSetNeighbor(x, y) {
     return (
-      this.isSet(x - 1, y) ||
-      this.isSet(x, y - 1) ||
-      this.isSet(x + 1, y) ||
-      this.isSet(x, y + 1)
+      (this.isActive(x - 1, y) && this.isSet(x - 1, y)) ||
+      (this.isActive(x + 1, y) && this.isSet(x + 1, y)) ||
+      (this.isActive(x , y + 1) && this.isSet(x , y +1)) ||
+      (this.isActive(x , y - 1) && this.isSet(x , y -1)) 
     );
   }
 
@@ -100,7 +100,7 @@ class Field {
   }
 
   toString() {
-    let string = '';
+    let string = "";
 
     for (let i = 0; i < this.size; i++) {
       string += "\n";
