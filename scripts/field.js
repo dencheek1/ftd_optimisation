@@ -13,20 +13,27 @@ class Field {
       this.fieldState[i] = state;
     }
   }
-
+equalField(field){
+  if(field.size != this.size) return false;
+  for(let i = 0; i < this.size; i++){
+    if(this.fieldActive[i] != field.fieldActive[i]) return false;
+  }
+  return true;
+}
   optimalPattern(offset) {
     let state = 1108378657;
     for (let i = 0; i < this.size; i++) {
       this.fieldState[i] = state << (2 * (i + (offset % 5))) % 5;
     }
+    return this;
   }
 
   hasSetNeighbor(x, y) {
     return (
       (this.isActive(x - 1, y) && this.isSet(x - 1, y)) ||
       (this.isActive(x + 1, y) && this.isSet(x + 1, y)) ||
-      (this.isActive(x , y + 1) && this.isSet(x , y +1)) ||
-      (this.isActive(x , y - 1) && this.isSet(x , y -1)) 
+      (this.isActive(x, y + 1) && this.isSet(x, y + 1)) ||
+      (this.isActive(x, y - 1) && this.isSet(x, y - 1))
     );
   }
 

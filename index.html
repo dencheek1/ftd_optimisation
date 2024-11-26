@@ -10,20 +10,29 @@
 </head>
 
 <body>
+    <header>
+        <div class="header__logo">logo</div>
+        <div class="header__controls">
+            <div class="header__help">help</div>
+            <div class="header__text">text</div>
+        </div>
+    </header>
     <div class="wrapper">
-        <div class="inputs">
-            <div class="input__reset-button button">reset</div>
-            <div class="input__field-size button">small</div>
-            <div class="range">
-                <input type="number" min="4" max="32" value="11" id="range" />
+        <div class="setup fancy-shadow">
+            <div class="inputs ">
+                <div class="range">
+                    <input type="number" min="4" max="32" value="11" id="range" />
+                </div>
+                <div class="input__reset-button button ">reset</div>
+                <div class="input__search-button button" id="search">search</div>
             </div>
-            <div class="input__search-button button" id="search">search</div>
+            <div class="row">
+                <div class="field" id="field"></div>
+            </div>
         </div>
-        <div class="row">
-            <div class="field" id="field"></div>
-        </div>
-            <div class="results"></div>
+        <div class="results fancy-shadow"></div>
     </div>
+    <footer></footer>
     <script type="module" src="scripts/src.js"></script>
 </body>
 

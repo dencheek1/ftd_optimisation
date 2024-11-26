@@ -1,6 +1,35 @@
 body {
-  background-color: #d0d0d0;
+  background-color: #444;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: #333;
+  width: 100%;
+  height: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 80px;
+  color: #f5f5f5f5;
+}
+
+footer {
+  height: 60px;
+  width: 100%;
+  background: #333;
+  margin-top: auto;
+}
+
+.header__controls {
+  display: flex;
+  font-size: 1.5em;
+}
+
+.header__controls > * {
+  margin: 10px;
 }
 
 .wrapper {
@@ -15,19 +44,70 @@ body {
 .field,
 .inputs,
 .results {
-  background: gray;
+  background: #444;
+  margin: 30px;
 }
 
+.setup {
+  margin: 30px;
+}
+
+.inputs {
+  background: unset;
+}
 .field {
   display: flex;
-  min-width: 300px;
-  min-height: 300px;
+  min-width: 400px;
+  min-height: 400px;
   align-items: center;
   justify-content: center;
   /* flex-direction:column; */
 }
 
+.fancy-shadow {
+  position: relative;
+  background: #444;
+}
+.fancy-shadow::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  content: "";
+  background: #444;
+  filter: blur(1px);
+  z-index: -1;
+}
+.fancy-shadow::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  content: "";
+  /* background: black; */
+  background: linear-gradient(to right top, #2f2f2f 40%, #4f4f4f 53%);
+  z-index: -10;
+  filter: blur(10px);
+}
+.fancy-shadow,
+.fancy-shadow::before,
+.fancy-shadow::after {
+  border-radius: 1em;
+}
+
+.inputs {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .field__column {
+  height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   /* min-width:30px; */
@@ -37,9 +117,14 @@ body {
 
 .field__cell {
   background: #f00;
+  width: 100%;
+  aspect-ratio: 1;
   min-height: 15px;
   min-width: 15px;
-  border: 1px solid #0001;
+  border: 1px solid #555;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .field__column:nth-child(even) .field__cell:nth-child(even) {
@@ -50,6 +135,30 @@ body {
 }
 .field__cell[active] {
   background-color: green;
+  position:relative;
+}
+.field__cell[active]::before  {
+  position: absolute;
+  display: block;
+  content: "";
+  position: absolute;
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  background: black;
+}
+
+.field__cell[active]::after {
+  position: absolute;
+  display: block;
+  content: "";
+  top: 30%;
+  left: 30%;
+  width: 40%;
+  height: 40%;
+  border-radius: 50%;
+  z-index: 10;
+  background: green;
 }
 
 .field__cell[clip] {
@@ -61,15 +170,22 @@ body {
 }
 
 .button {
-  color: white;
-  background-color: #222;
+  position: relative;
+  color: #e0e0e0;
+  background-color: #333;
   margin: 5px;
+  text-align: center;
+  border-radius: 10px;
+  font-size: 1.3em;
+  width: 120px;
+  overflow: hidden;
+  z-index: 10;
+  transition: 0.2s;
 }
 
 .button:hover {
-  background-color: #332;
+  background: #555;
 }
-
 .field-column {
   display: flex;
   flex-direction: column;
@@ -86,8 +202,16 @@ body {
 
 .row {
   display: flex;
+  padding: 15px;
+  align-items: center;
+  justify-content: center;
 }
 
 .row > * {
   margin: 5px;
+}
+
+
+.field__info{
+    width: 70px;
 }

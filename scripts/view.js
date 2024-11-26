@@ -10,10 +10,15 @@ function drawEvent(e) {
 
 let flag = false;
 let counter = 0;
+let best;
 
-let worker;
-if (window.Worker)
+let worker = [];
+if (window.Worker) {
   worker = new Worker("scripts/webworker.js", { type: "module" });
+  // worker[0] = new Worker("scripts/webworker.js", { type: "module" });
+  // worker[1] = new Worker("scripts/webworker.js", { type: "module" });
+  // worker[2] = new Worker("scripts/webworker.js", { type: "module" });
+}
 
 function generateField(size) {
   //TODO reverse dependencie, create data model based on field view
@@ -39,7 +44,7 @@ function generateField(size) {
 
 function generateViewNode(field) {
   const node = document.createElement("div");
-  const count = document.createElement("div");
+  const info = document.createElement("div");
   let score = 0;
   let active = 0;
 
@@ -65,11 +70,14 @@ function generateViewNode(field) {
       }
       column.appendChild(cell);
     }
-    count.textContent = `score = ${score}; ratio =${active / score}`;
 
     node.appendChild(column);
-    node.append(count);
   }
+  info.textContent = `autoloaders = ${score}; ratio =${(active / score).toFixed(
+    2
+  )} generation: ${counter}`;
+  info.setAttribute('class', 'field__info');
+  node.append(info);
 
   return node;
 }
@@ -94,7 +102,7 @@ function searchField() {
 
     let gaInstance = new GAInstance(f);
 
-    let best = gaInstance; //population[0]
+    if (best == undefined || !best.equalField(gaInstance)) best = gaInstance; //population[0]
     let change = 0;
     const result = document.getElementsByClassName("results")[0];
     while (change-- > 0) {
@@ -117,7 +125,11 @@ function searchField() {
       worker.onmessage = (m) => {
         counter++;
         let solution = new GAInstance(m.data);
-        if (solution.score() > best.score()) {
+        if (
+          best.equalField(solution) &&
+          solution.score() >= best.score() &&
+          best.size == solution.size
+        ) {
           best = solution;
           if (result) {
             result.textContent = "";
@@ -125,7 +137,6 @@ function searchField() {
           }
         }
         console.log(best.score());
-        console.log(counter);
         if (flag) {
           if (counter % 2 == 0) {
             worker.postMessage(gaInstance);
@@ -138,8 +149,7 @@ function searchField() {
       };
       worker.onerror = (e) => console.log(e.message);
     }
-  }
-  else{
+  } else {
     counter = 0;
   }
 }

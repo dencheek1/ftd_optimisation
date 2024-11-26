@@ -52,9 +52,11 @@ class GAInstance extends Field {
     let clone = this.clone();
     let x = Math.ceil(Math.random() * clone.size - 1);
     let y = Math.ceil(Math.random() * clone.size - 1);
-    while (!clone.isActive(x, y)) {
+    let counter = 50;
+    while (!clone.isActive(x, y) && counter > 0) {
       x = Math.ceil(Math.random() * clone.size - 1);
       y = Math.ceil(Math.random() * clone.size - 1);
+      counter--;
     }
     clone.toggleCell(x, y);
     return clone;
@@ -66,51 +68,8 @@ class GAInstance extends Field {
       for (let x = 0; x < this.size; x++) {
         if (this.isActive(x, y)) {
           if (this.isSet(x, y)) {
-            //check if match pattern
-            // TODO change for bit operation
-            // if ( this.isSet(x, y + 2) ||
-            //   this.isSet(x, y - 2) ||
-            //   this.isSet(x - 1, y + 1) ||
-            //   this.isSet(x, y + 1) ||
-            //   this.isSet(x + 1, y + 1) ||
-            //   this.isSet(x - 1, y - 1) ||
-            //   this.isSet(x, y - 1) ||
-            //   this.isSet(x + 1, y - 1) ||
-            //   this.isSet(x - 2, y) ||
-            //   this.isSet(x - 1, y) ||
-            //   this.isSet(x + 1, y) ||
-            //   this.isSet(x + 2, y)
-            // )
-            // if (
-            //   (this.isSet(x - 1, y + 1) && this.isSet(x + 1, y - 1)) ||
-            //   (this.isSet(x + 1, y + 1) && this.isSet(x - 1, y + 1))
-            // )
-            //   score += 0;
-            // else if (
-            //   (this.isSet(x + 1, y + 1) && this.isSet(x - 1, y + 1)) ||
-            //   (this.isSet(x + 1, y + 1) && this.isSet(x + 1, y - 1)) ||
-            //   (this.isSet(x - 1, y - 1) && this.isSet(x + 1, y - 1)) ||
-            //   (this.isSet(x - 1, y - 1) && this.isSet(x - 1, y + 1))
-            // ) {
-            //   score += 1;
-            // } else {
-            //   let temp =
-            //     (this.isSet(x - 2, y) || this.isSet(x - 1, y)) +
-            //     (this.isSet(x + 2, y) || this.isSet(x + 1, y)) +
-            //     (this.isSet(x, y - 1) || this.isSet(x, y - 2)) +
-            //     (this.isSet(x, y + 1) || this.isSet(x, y + 2));
-            //   score += 4 - temp;
-            // }
             score += 1;
-            // else
           } else if (this.hasSetNeighbor(x, y)) {
-            //check if match pattern
-            // let temp =
-            //   this.isSet(x - 1, y) +
-            //   this.isSet(x + 1, y) +
-            //   this.isSet(x, y - 1) +
-            //   this.isSet(x, y + 1);
-            // let temp =
             score += 2; // - temp;
           } else score -= 2;
         }
@@ -125,18 +84,18 @@ class GASearch {
 
   static generatePopulation(instance) {
     let population = [];
-    let allSet = instance.clone();
-    allSet.fieldState = [
-      -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-      -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    ];
-    let allUnset = instance.clone();
-    allUnset.fieldState = [
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0,
-    ];
+    // let allSet = instance.clone();
+    // allSet.fieldState = [
+    //   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    //   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    // ];
+    // let allUnset = instance.clone();
+    // allUnset.fieldState = [
+    //   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    //   0, 0, 0, 0, 0, 0, 0,
+    // ];
 
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 1; i++) {
       population[i] = instance.clone();
     }
     return population;
@@ -145,7 +104,7 @@ class GASearch {
   static updatePopulation(best, second, last, mutationRate) {
     let population = [];
 
-    for (let i = 5; i > 0; i--) {
+    for (let i = 6; i > 0; i--) {
       population.push(best.clone());
       population.push(second.clone());
       population.push(last.clone());
@@ -155,16 +114,13 @@ class GASearch {
     }
     let size = population.length;
     for (let i = 0; i < size - 6; i++) {
-      for (let m = 0; m < mutationRate + i / 6; m++) {
+      for (let m = 0; m < mutationRate; m++) {
         population[i] = population[i].mutate();
       }
     }
 
     // for(let i = 0; i < size / 5; i++){
     //   population[i] = population[i].breed(population[i + 6])
-    // }
-    // for (let i = 0; i < population.length; i += 4) {
-    //   population[i] = population[i].mutate();
     // }
     return population;
   }
@@ -193,8 +149,10 @@ class GASearch {
   }
 
   static findSolution(instance) {
-    let mutationRate = Math.ceil(instance.size * 0.1) | 1;
-    console.log(`mutationRate ${mutationRate}`);
+    let mutationRate = Math.ceil(instance.size * 0.07) | 1;
+    // let mutationRate = Math.ceil(instance.size**2 * 0.007) | 1;
+    
+
     let population = this.generatePopulation(instance);
     let size = population[0].size;
 
