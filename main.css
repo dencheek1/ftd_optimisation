@@ -77,19 +77,21 @@ footer {
   display: block;
   content: "";
   background: #444;
-  filter: blur(1px);
+  filter: blur(5px);
   z-index: -1;
 }
 .fancy-shadow::after {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: -5px;
+  left: -5px;
+  /* width: 102%; */
+  /* height: 100%; */
+  width: calc(100% + 10px);
+  height: calc(100% + 10px);
   display: block;
   content: "";
   /* background: black; */
-  background: linear-gradient(to right top, #2f2f2f 40%, #4f4f4f 53%);
+  background: linear-gradient(to right top, #303030 48%, #505050 50%);
   z-index: -10;
   filter: blur(10px);
 }
@@ -106,8 +108,6 @@ footer {
 }
 
 .field__column {
-  height: 100%;
-  width: 100%;
   display: flex;
   flex-direction: column;
   /* min-width:30px; */
@@ -116,7 +116,7 @@ footer {
 }
 
 .field__cell {
-  background: #f00;
+  background: #d11;
   width: 100%;
   aspect-ratio: 1;
   min-height: 15px;
@@ -127,6 +127,18 @@ footer {
   align-items: center;
 }
 
+.small{
+  width:15px;
+}
+
+.normal{
+  width:25px;
+}
+
+.large{
+  width:40px;
+}
+
 .field__column:nth-child(even) .field__cell:nth-child(even) {
   opacity: 0.8;
 }
@@ -135,9 +147,9 @@ footer {
 }
 .field__cell[active] {
   background-color: green;
-  position:relative;
+  position: relative;
 }
-.field__cell[active]::before  {
+.field__cell[active]::before {
   position: absolute;
   display: block;
   content: "";
@@ -194,12 +206,6 @@ footer {
   align-items: center;
 }
 
-.field-cell {
-  background: #f00;
-  height: 25px;
-  width: 25px;
-}
-
 .row {
   display: flex;
   padding: 15px;
@@ -211,7 +217,6 @@ footer {
   margin: 5px;
 }
 
-
-.field__info{
-    width: 70px;
+.field__info {
+  width: 70px;
 }

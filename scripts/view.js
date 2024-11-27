@@ -23,12 +23,14 @@ if (window.Worker) {
 function generateField(size) {
   //TODO reverse dependencie, create data model based on field view
   // * would be nice to have methods for two ways
+  let cellSize = "normal";
+  cellSize = size < 9 ? 'large' : size > 16 ? 'small' : 'normal'; 
   for (let xIndex = 0; xIndex < size; xIndex++) {
     let column = document.createElement("div");
     column.setAttribute("class", "field__column");
     for (let yIndex = 0; yIndex < size; yIndex++) {
       let cell = document.createElement("div");
-      cell.setAttribute("class", "field__cell");
+      cell.setAttribute("class", "field__cell " + cellSize);
       cell.setAttribute("x", xIndex);
       cell.setAttribute("y", yIndex);
       column.appendChild(cell);
@@ -48,6 +50,8 @@ function generateViewNode(field) {
   let score = 0;
   let active = 0;
 
+  let cellSize = "normal";
+  cellSize = field.size < 9 ? 'large' : field.size > 16 ? 'small' : 'normal'; 
   node.setAttribute("class", "field");
   for (let xIndex = 0; xIndex < field.size; xIndex++) {
     let column = document.createElement("div");
@@ -55,6 +59,7 @@ function generateViewNode(field) {
     for (let yIndex = 0; yIndex < field.size; yIndex++) {
       let cell = document.createElement("div");
       cell.setAttribute("class", "field__cell");
+      cell.setAttribute("class", "field__cell " + cellSize);
       cell.setAttribute("x", xIndex);
       cell.setAttribute("y", yIndex);
       if (!field.isActive(xIndex, yIndex)) {
