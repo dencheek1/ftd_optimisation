@@ -8,7 +8,7 @@ body {
 header {
   background: #333;
   width: 100%;
-  height: 60px;
+  height: 70px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -116,7 +116,7 @@ footer {
 }
 
 .field__cell {
-  background: #d11;
+  background: #eb3a5b;
   width: 100%;
   aspect-ratio: 1;
   min-height: 15px;
@@ -139,14 +139,12 @@ footer {
   width:40px;
 }
 
-.field__column:nth-child(even) .field__cell:nth-child(even) {
-  opacity: 0.8;
-}
+.field__column:nth-child(even) .field__cell:nth-child(even),  
 .field__column:nth-child(odd) .field__cell:nth-child(odd) {
-  opacity: 0.8;
+  opacity: 0.5;
 }
 .field__cell[active] {
-  background-color: green;
+  background-color: #3aebca;
   position: relative;
 }
 .field__cell[active]::before {
@@ -157,7 +155,7 @@ footer {
   width: 70%;
   height: 70%;
   border-radius: 50%;
-  background: black;
+  background: #111;
 }
 
 .field__cell[active]::after {
@@ -170,11 +168,11 @@ footer {
   height: 40%;
   border-radius: 50%;
   z-index: 10;
-  background: green;
+  background-color: #3aebca;
 }
 
 .field__cell[clip] {
-  background-color: #448;
+  background-color: #66a;
 }
 
 .field__cell[disabled] {
@@ -218,5 +216,18 @@ footer {
 }
 
 .field__info {
-  width: 70px;
+  width: 80px;
+  margin:10px;
+  font-size:1.2em;
+  color:white;
+}
+
+.header__logo{
+  height:30px;
+  display:flex;
+  align-items: center;
+}
+
+.header__logo svg{
+  height:45px;
 }

@@ -114,9 +114,9 @@ class GASearch {
     }
     let size = population.length;
     for (let i = 0; i < size - 6; i++) {
-      for (let m = 0; m < mutationRate; m++) {
+      // for (let m = 0; m < mutationRate; m++) {
         population[i] = population[i].mutate();
-      }
+      // }
     }
 
     // for(let i = 0; i < size / 5; i++){
@@ -148,8 +148,8 @@ class GASearch {
     return newPopulation;
   }
 
-  static findSolution(instance) {
-    let mutationRate = Math.ceil(instance.size * 0.07) | 1;
+  static findSolution(instance, mutationRate) {
+    // let mutationRate = Math.ceil(instance.size * 0.07) | 1;
     // let mutationRate = Math.ceil(instance.size**2 * 0.007) | 1;
     
 

@@ -78,9 +78,18 @@ function generateViewNode(field) {
 
     node.appendChild(column);
   }
-  info.textContent = `autoloaders = ${score}; ratio =${(active / score).toFixed(
-    2
-  )} generation: ${counter}`;
+  let div = document.createElement('div');
+  div.setAttribute('class', 'info__item');
+  div.textContent = ('autoloaders ' + score); 
+  console.log(div.innerText);
+  info.appendChild(div.cloneNode(true));
+  div.textContent = 'ratio ' + active / score; 
+  info.appendChild(div.cloneNode(true));
+  div.textContent = 'clips ' + active; 
+  info.appendChild(div.cloneNode(true));
+  // info.textContent = `autoloaders = ${score}; ratio =${(active / score).toFixed(
+  //   2
+  // )} generation: ${counter}`;
   info.setAttribute('class', 'field__info');
   node.append(info);
 
@@ -136,7 +145,7 @@ function searchField() {
           best.size == solution.size
         ) {
           best = solution;
-          if (result) {
+          if (result && flag) {
             result.textContent = "";
             result.appendChild(generateViewNode(best));
           }
@@ -144,7 +153,7 @@ function searchField() {
         console.log(best.score());
         if (flag) {
           if (counter % 2 == 0) {
-            worker.postMessage(gaInstance);
+            worker.postMessage(gaInstance.clone());
           } else if (counter % 5 == 0) {
             let pattern = gaInstance.clone();
             pattern.optimalPattern(counter / 5);
