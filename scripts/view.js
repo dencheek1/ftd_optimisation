@@ -83,14 +83,21 @@ function generateViewNode(field) {
   div.textContent = ('autoloaders ' + score); 
   console.log(div.innerText);
   info.appendChild(div.cloneNode(true));
-  div.textContent = 'ratio ' + active / score; 
-  info.appendChild(div.cloneNode(true));
   div.textContent = 'clips ' + active; 
   info.appendChild(div.cloneNode(true));
-  // info.textContent = `autoloaders = ${score}; ratio =${(active / score).toFixed(
-  //   2
-  // )} generation: ${counter}`;
   info.setAttribute('class', 'field__info');
+  div.textContent = 'ratio ' + (active / score).toFixed(2); 
+  info.appendChild(div.cloneNode(true));
+  div.textContent = 'material:';
+  info.appendChild(div.cloneNode(true));
+  div.textContent = '1 m ' + ((active * 160) + score * 240); 
+  info.appendChild(div.cloneNode(true));
+  div.textContent = '2 m ' + ((active * 200) + score * 300); 
+  info.appendChild(div.cloneNode(true));
+  div.textContent = '4 m ' + ((active * 240) + score * 360); 
+  info.appendChild(div.cloneNode(true));
+  div.textContent = '8 m ' + ((active * 320) + score * 480); 
+  info.appendChild(div.cloneNode(true));
   node.append(info);
 
   return node;

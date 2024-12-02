@@ -50,6 +50,9 @@ footer {
 
 .setup {
   margin: 30px;
+  display:flex;
+  flex-direction:column;
+  align-items: center;
 }
 
 .inputs {
@@ -84,17 +87,15 @@ footer {
   position: absolute;
   top: -5px;
   left: -5px;
-  /* width: 102%; */
-  /* height: 100%; */
   width: calc(100% + 10px);
   height: calc(100% + 10px);
   display: block;
   content: "";
-  /* background: black; */
   background: linear-gradient(to right top, #303030 48%, #505050 50%);
   z-index: -10;
   filter: blur(10px);
 }
+
 .fancy-shadow,
 .fancy-shadow::before,
 .fancy-shadow::after {
@@ -143,10 +144,12 @@ footer {
 .field__column:nth-child(odd) .field__cell:nth-child(odd) {
   opacity: 0.5;
 }
+
 .field__cell[active] {
   background-color: #3aebca;
   position: relative;
 }
+
 .field__cell[active]::before {
   position: absolute;
   display: block;
@@ -196,6 +199,7 @@ footer {
 .button:hover {
   background: #555;
 }
+
 .field-column {
   display: flex;
   flex-direction: column;
@@ -216,9 +220,9 @@ footer {
 }
 
 .field__info {
-  width: 80px;
+  width: 95px;
   margin:10px;
-  font-size:1.2em;
+  font-size:1.0em;
   color:white;
 }
 
@@ -230,4 +234,9 @@ footer {
 
 .header__logo svg{
   height:45px;
+}
+.inputs__instruction
+{
+  color:white;
+  margin:10px 0;
 }
