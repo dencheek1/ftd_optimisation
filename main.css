@@ -139,7 +139,11 @@ footer {
 .large{
   width:40px;
 }
-
+.column{
+  display: flex;
+  flex-direction:column;
+  align-items: center;
+}
 .field__column:nth-child(even) .field__cell:nth-child(even),  
 .field__column:nth-child(odd) .field__cell:nth-child(odd) {
   opacity: 0.5;
@@ -224,6 +228,7 @@ footer {
   margin:10px;
   font-size:1.0em;
   color:white;
+  text-align:start;
 }
 
 .header__logo{

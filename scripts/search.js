@@ -114,14 +114,11 @@ class GASearch {
     }
     let size = population.length;
     for (let i = 0; i < size - 6; i++) {
-      // for (let m = 0; m < mutationRate; m++) {
+      for (let m = 0; m < mutationRate; m++) {
         population[i] = population[i].mutate();
-      // }
+      }
     }
 
-    // for(let i = 0; i < size / 5; i++){
-    //   population[i] = population[i].breed(population[i + 6])
-    // }
     return population;
   }
 

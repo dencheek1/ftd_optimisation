@@ -24,7 +24,7 @@ function generateField(size) {
   //TODO reverse dependencie, create data model based on field view
   // * would be nice to have methods for two ways
   let cellSize = "normal";
-  cellSize = size < 9 ? 'large' : size > 16 ? 'small' : 'normal'; 
+  cellSize = size < 9 ? "large" : size > 16 ? "small" : "normal";
   for (let xIndex = 0; xIndex < size; xIndex++) {
     let column = document.createElement("div");
     column.setAttribute("class", "field__column");
@@ -38,20 +38,26 @@ function generateField(size) {
     fieldView.appendChild(column);
   }
 
+  if(isTouchPointer()){
+    fieldView.addEventListener('click', toggleCell);
+  }
+  else {
+
   fieldView.addEventListener("mouseover", drawEvent);
   fieldView.addEventListener("mousedown", clickDraw);
+  }
   fieldView.setAttribute("onContextMenu", "return false;");
   fieldView.setAttribute("onDragStart", "return false;");
 }
 
 function generateViewNode(field) {
   const node = document.createElement("div");
+  const wrapper = document.createElement('div');
   const info = document.createElement("div");
   let score = 0;
   let active = 0;
-
   let cellSize = "normal";
-  cellSize = field.size < 9 ? 'large' : field.size > 16 ? 'small' : 'normal'; 
+  cellSize = field.size < 9 ? "large" : field.size > 16 ? "small" : "normal";
   node.setAttribute("class", "field");
   for (let xIndex = 0; xIndex < field.size; xIndex++) {
     let column = document.createElement("div");
@@ -78,34 +84,43 @@ function generateViewNode(field) {
 
     node.appendChild(column);
   }
-  let div = document.createElement('div');
-  div.setAttribute('class', 'info__item');
-  div.textContent = ('autoloaders ' + score); 
+  let div = document.createElement("div");
+  div.setAttribute("class", "info__item");
+  div.textContent = "autoloaders " + score;
   console.log(div.innerText);
   info.appendChild(div.cloneNode(true));
-  div.textContent = 'clips ' + active; 
+  div.textContent = "clips " + active;
   info.appendChild(div.cloneNode(true));
-  info.setAttribute('class', 'field__info');
-  div.textContent = 'ratio ' + (active / score).toFixed(2); 
+  info.setAttribute("class", "field__info");
+  div.textContent = "ratio " + (active / score).toFixed(2);
   info.appendChild(div.cloneNode(true));
-  div.textContent = 'material:';
+  div.textContent = "material:";
   info.appendChild(div.cloneNode(true));
-  div.textContent = '1 m ' + ((active * 160) + score * 240); 
+  div.textContent = "1 m " + (active * 160 + score * 240);
   info.appendChild(div.cloneNode(true));
-  div.textContent = '2 m ' + ((active * 200) + score * 300); 
+  div.textContent = "2 m " + (active * 200 + score * 300);
   info.appendChild(div.cloneNode(true));
-  div.textContent = '4 m ' + ((active * 240) + score * 360); 
+  div.textContent = "4 m " + (active * 240 + score * 360);
   info.appendChild(div.cloneNode(true));
-  div.textContent = '8 m ' + ((active * 320) + score * 480); 
+  div.textContent = "8 m " + (active * 320 + score * 480);
   info.appendChild(div.cloneNode(true));
   node.append(info);
-
+  div.hasAttribute;
   return node;
 }
 
 function clickDraw(e) {
   if (e.button == 0) e.target.setAttribute("disabled", "");
   else if (e.button == 2) e.target.removeAttribute("disabled");
+}
+
+function toggleCell(e) {
+  if (e.target.hasAttribute("disabled")) {
+    e.target.removeAttribute("disabled");
+  } else {
+    e.target.setAttribute("disabled", "");
+    // e.target.removeAttribute("disabled");
+  }
 }
 
 function resetField() {
@@ -140,7 +155,6 @@ function searchField() {
       }
     }
     if (window.Worker) {
-      console.log(best.toString());
       // console.log(new GAInstance(f))
       worker.postMessage(new GAInstance(f));
       worker.onmessage = (m) => {
@@ -157,7 +171,6 @@ function searchField() {
             result.appendChild(generateViewNode(best));
           }
         }
-        console.log(best.score());
         if (flag) {
           if (counter % 2 == 0) {
             worker.postMessage(gaInstance.clone());
@@ -183,10 +196,14 @@ if (search) search.addEventListener("mouseup", searchField);
 const size = document.getElementById("range");
 
 size.addEventListener("change", (e) => {
-  if (e.target.value) {
+  if (e.target.value && e.target.value < 33 && e.target.value > 3) {
     fieldView.textContent = "";
     generateField(e.target.value);
+  } else {
+    e.target.value = 11; 
   }
 });
-
+function isTouchPointer(){
+  return matchMedia('(pointer: coarse)').matches;
+}
 export { drawEvent, generateField };
