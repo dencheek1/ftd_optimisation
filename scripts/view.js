@@ -53,6 +53,7 @@ function generateField(size) {
 function generateViewNode(field) {
   const node = document.createElement("div");
   const wrapper = document.createElement('div');
+  wrapper.setAttribute('class','column' )
   const info = document.createElement("div");
   let score = 0;
   let active = 0;
@@ -104,9 +105,10 @@ function generateViewNode(field) {
   info.appendChild(div.cloneNode(true));
   div.textContent = "8 m " + (active * 320 + score * 480);
   info.appendChild(div.cloneNode(true));
-  node.append(info);
-  div.hasAttribute;
-  return node;
+  // node.append(info);
+  wrapper.appendChild(node);
+  wrapper.appendChild(info)
+  return wrapper;
 }
 
 function clickDraw(e) {
