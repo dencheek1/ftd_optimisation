@@ -7,7 +7,7 @@ import { GAInstance, GASearch } from './search.js';
 
 // generateField(new Field(4));
 
-const range = document.getElementById('range');
+const range = document.getElementById('value');
 if (range.value) {
     generateField(range.value);
 }

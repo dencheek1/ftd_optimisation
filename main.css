@@ -196,16 +196,21 @@ footer {
   overflow: hidden;
   z-index: 10;
   transition: 0.2s;
+  user-select: none;
 }
 
 .button:hover {
   background: #555;
 }
 
+.button.button-small{
+  width: 30px;
+  height: 30px;
+}
+
 .field-column {
   display: flex;
   flex-direction: column;
-  /* min-width:30px; */
   justify-content: center;
   align-items: center;
 }
@@ -240,7 +245,7 @@ footer {
 }
 .inputs__instruction {
   color: white;
-margin: 10px 10px;
+  margin: 10px 10px;
 }
 
 @media screen and (max-width: 480px) {
@@ -255,14 +260,25 @@ margin: 10px 10px;
     width: 25px;
   }
   .setup {
-    width: 240px;
+    min-width: 260px;
   }
   .field {
     min-width: 220px;
     min-height: 220px;
   }
-.inputs__instruction {
-display: none;
+  .inputs__instruction {
+    display: none;
+  }
+  body{
+    overflow:scroll;
+  }
 }
 
+.range{
+  display:flex;
+  color:white;
+}
+
+.range * {
+  margin:10px;
 }

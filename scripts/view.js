@@ -38,13 +38,11 @@ function generateField(size) {
     fieldView.appendChild(column);
   }
 
-  if(isTouchPointer()){
-    fieldView.addEventListener('click', toggleCell);
-  }
-  else {
-
-  fieldView.addEventListener("mouseover", drawEvent);
-  fieldView.addEventListener("mousedown", clickDraw);
+  if (isTouchPointer()) {
+    fieldView.addEventListener("click", toggleCell);
+  } else {
+    fieldView.addEventListener("mouseover", drawEvent);
+    fieldView.addEventListener("mousedown", clickDraw);
   }
   fieldView.setAttribute("onContextMenu", "return false;");
   fieldView.setAttribute("onDragStart", "return false;");
@@ -52,8 +50,8 @@ function generateField(size) {
 
 function generateViewNode(field) {
   const node = document.createElement("div");
-  const wrapper = document.createElement('div');
-  wrapper.setAttribute('class','column' )
+  const wrapper = document.createElement("div");
+  wrapper.setAttribute("class", "column");
   const info = document.createElement("div");
   let score = 0;
   let active = 0;
@@ -107,7 +105,7 @@ function generateViewNode(field) {
   info.appendChild(div.cloneNode(true));
   // node.append(info);
   wrapper.appendChild(node);
-  wrapper.appendChild(info)
+  wrapper.appendChild(info);
   return wrapper;
 }
 
@@ -190,22 +188,36 @@ function searchField() {
   }
 }
 
+let size = 11;
+const sizeView = document.getElementById("value");
+const decreaseSize = () => {
+  if (size > 4) {
+    size--;
+    fieldView.innerText = "";
+    generateField(size);
+    sizeView.innerText = size;
+  }
+};
+
+const increaseSize = () => {
+  if (size < 31) {
+    size++;
+    fieldView.innerText = "";
+    generateField(size);
+    sizeView.innerText = size;
+  }
+};
+
 const reset = document.getElementsByClassName("input__reset-button")[0];
 if (reset) reset.addEventListener("mouseup", resetField);
 const search = document.getElementsByClassName("input__search-button")[0];
 if (search) search.addEventListener("mouseup", searchField);
+const increase = document.getElementById("size-increase");
+if (increase) increase.addEventListener("mouseup", increaseSize);
+const decrease = document.getElementById("size-decrease");
+if (decrease) decrease.addEventListener("mouseup", decreaseSize);
 
-const size = document.getElementById("range");
-
-size.addEventListener("change", (e) => {
-  if (e.target.value && e.target.value < 33 && e.target.value > 3) {
-    fieldView.textContent = "";
-    generateField(e.target.value);
-  } else {
-    e.target.value = 11; 
-  }
-});
-function isTouchPointer(){
-  return matchMedia('(pointer: coarse)').matches;
+function isTouchPointer() {
+  return matchMedia("(pointer: coarse)").matches;
 }
 export { drawEvent, generateField };
