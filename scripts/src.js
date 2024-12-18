@@ -15,6 +15,8 @@ else {
     generateField(11);
 }
 let field = new Field(7);
+console.log(field.toString());
+console.log(field.getClipState(0,0));
 field.makeInactive(0,0);
 field.makeInactive(1,0);
 field.makeInactive(0,1);

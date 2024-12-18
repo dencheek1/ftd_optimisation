@@ -2,7 +2,6 @@
 
 import Field from "./field.js";
 //TODO
-// * something something web workers
 
 class GAInstance extends Field {
   // really bad solution
@@ -35,16 +34,6 @@ class GAInstance extends Field {
       clone.fieldState[i] = this.fieldState[i];
       clone.fieldActive[i] = this.fieldActive[i];
     }
-    // this.fieldData.array.forEach(element => {
-    //     let column = [];
-    //     element.forEach(el => {
-    //         column.push({ active: el.active, state: el.state })
-    //     });
-    //     data.push(column);
-    // });
-    // let data = structuredClone(this.fieldData);
-    // clone.fieldData = {array:  data};
-    // clone.fieldData = data;
     return clone;
   }
 
@@ -84,17 +73,6 @@ class GASearch {
 
   static generatePopulation(instance) {
     let population = [];
-    // let allSet = instance.clone();
-    // allSet.fieldState = [
-    //   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    //   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    // ];
-    // let allUnset = instance.clone();
-    // allUnset.fieldState = [
-    //   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    //   0, 0, 0, 0, 0, 0, 0,
-    // ];
-
     for (let i = 0; i < 1; i++) {
       population[i] = instance.clone();
     }
@@ -146,9 +124,6 @@ class GASearch {
   }
 
   static findSolution(instance, mutationRate) {
-    // let mutationRate = Math.ceil(instance.size * 0.07) | 1;
-    // let mutationRate = Math.ceil(instance.size**2 * 0.007) | 1;
-    
 
     let population = this.generatePopulation(instance);
     let size = population[0].size;

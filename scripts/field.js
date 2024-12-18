@@ -4,22 +4,29 @@ class Field {
     this.size = size;
     this.fieldActive = [];
     this.fieldState = [];
+    //use 2 bits for a clip state
+    this.clipState = [];
     for (let i = 0; i < size; i++) {
       let active = -1;
-      // let state = 1108378657;
       let state = -1;
       this.fieldActive[i] = active;
-      // this.fieldState[i] = state << (2 * (i ) % 5) ;
       this.fieldState[i] = state;
+      this.clipState[i * 2] = 0;
+      this.clipState[i * 2 + 1] = 0;
     }
   }
-equalField(field){
-  if(field.size != this.size) return false;
-  for(let i = 0; i < this.size; i++){
-    if(this.fieldActive[i] != field.fieldActive[i]) return false;
+
+  // TODO refactor. Make normal looking conditions.
+  equalField(field) {
+    if (field.size != this.size) return false;
+    for (let i = 0; i < this.size; i++) {
+      if (this.fieldActive[i] != field.fieldActive[i]) return false;
+      if (this.clipState[i * 2] != field.clipState[i * 2]) return false;
+      if (this.clipState[i * + 1] != field.clipState[i * 2 + 1]) return false;
+    }
+    return true;
   }
-  return true;
-}
+
   optimalPattern(offset) {
     let state = 1108378657;
     for (let i = 0; i < this.size; i++) {
@@ -71,8 +78,6 @@ equalField(field){
 
   isActive(x, y) {
     return this.isPositionValid(x, y) && !!(this.fieldActive[y] & (1 << x));
-    // if (this.isPositionValid(x, y)) return this.fieldData.array[y][x].active;
-    // return false;
   }
 
   makeActive(x, y) {
@@ -82,7 +87,6 @@ equalField(field){
   }
 
   makeInactive(x, y) {
-    // if (this.isPositionValid(x, y)) this.fieldData.array[y][x].active = false;
     if (this.isPositionValid(x, y)) {
       this.fieldActive[y] = this.fieldActive[y] & ~(1 << x);
     }
@@ -106,6 +110,12 @@ equalField(field){
     return false;
   }
 
+  getClipState(x, y) {
+    if (this.isPositionValid(x, y)) {
+      return (this.clipState[y * 2 + (x > 16)] >> (x * 2) - ((x > 16) * 16) & 3);
+    };
+  }
+
   toString() {
     let string = "";
 
@@ -113,26 +123,34 @@ equalField(field){
       string += "\n";
       for (let j = 0; j < this.size; j++) {
         if ((this.fieldActive[i] & (1 << j)) != 0)
-          string += (this.fieldState[i] & (1 << j)) != 0 ? "o" : " ";
-        else string += "+";
+          // string += (this.fieldState[i] & (1 << j)) != 0 ? "o" : " ";
+          if (this.fieldState[i] & (1 << j) != 0) string += 'o';
+          else {
+            switch (this.getClipState(j, i)) {
+              case 0: string += '1';
+                break;
+              case 1:string += '2';
+                break;
+              case 2:string += '3';
+                break;
+              case 3:string += '4';
+                break;
+            }
+          }
       }
     }
-    // let string = this.fieldData.array.reduce((acc, val) =>
-    //     acc += val.reduce((iacc, ival) =>
-    //         iacc += ival.active ? ival.state ? '*' : '0' : ' ',
-    //         '') + '\n',
-    //     '')
     return string;
   }
 
   getSize() {
     return this.size;
   }
-  //Field data representation?
 
+  //Field data representation?
   size;
   fieldState;
   fieldActive;
+  clipState;
   fieldData;
 }
 
