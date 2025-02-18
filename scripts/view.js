@@ -1,5 +1,6 @@
 import Field from "./field.js";
 import { GASearch, GAInstance } from "./search.js";
+import TilingField from "./tiling_field.js";
 
 const fieldView = document.getElementById("field");
 
@@ -139,38 +140,41 @@ function searchField() {
   if (flag) {
     let f = Field.fieldFromView(fieldView);
 
-    let gaInstance = new GAInstance(f);
+    let gaInstance = new TilingField(f);
 
     if (best == undefined || !best.equalField(gaInstance)) best = gaInstance; //population[0]
     let change = 0;
     const result = document.getElementsByClassName("results")[0];
-    while (change-- > 0) {
-      population = GASearch.findSolution(best);
-      console.log(population[0].optimisedScore(3));
-      if (best.optimisedScore(3) < population[0].optimisedScore(3)) {
-        best = population[0];
-        change = 55;
-      }
+    // while (change-- > 0) {
+    //   population = GASearch.findSolution(best);
+    //   // console.log(population[0].score(3));
+    //   if (best.score(3) < population[0].score(3)) {
+    //     best = population[0];
+    //     change = 55;
+    //   }
 
-      let view = generateViewNode(best);
-      if (result) {
-        result.textContent = "";
-        result.appendChild(view);
-      }
-    }
+    //   let view = generateViewNode(best);
+    //   if (result) {
+    //     result.textContent = "";
+    //     result.appendChild(view);
+    //   }
+    // }
     if (window.Worker) {
       // console.log(new GAInstance(f))
-      worker.postMessage(new GAInstance(f));
+      worker.postMessage(new TilingField(f));
       worker.onmessage = (m) => {
         counter++;
-        let solution = new GAInstance(m.data);
+        console.log(m)
+        let solution = new TilingField(m.data);
+        solution.score();
+        console.log(solution);
         console.log(solution.toString());
-        console.log(solution.optimisedScore(3));
-        console.log(best.toString());
-        console.log(best.optimisedScore(3));
+        // console.log(solution.score(3));
+        // console.log(best.toString());
+        // console.log(best.score(3));
         if (
           best.equalField(solution) &&
-          solution.optimisedScore(3) >= best.optimisedScore(3) &&
+          solution.score() >= best.score() &&
           best.size == solution.size
         ) {
           best = solution;
