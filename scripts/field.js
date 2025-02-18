@@ -21,8 +21,8 @@ class Field {
     if (field.size != this.size) return false;
     for (let i = 0; i < this.size; i++) {
       if (this.fieldActive[i] != field.fieldActive[i]) return false;
-      if (this.clipState[i * 2] != field.clipState[i * 2]) return false;
-      if (this.clipState[i * + 1] != field.clipState[i * 2 + 1]) return false;
+      // if (this.clipState[i * 2] != field.clipState[i * 2]) return false;
+      // if (this.clipState[i * 2 + 1] != field.clipState[i * 2 + 1]) return false;
     }
     return true;
   }
@@ -112,8 +112,21 @@ class Field {
 
   getClipState(x, y) {
     if (this.isPositionValid(x, y)) {
-      return (this.clipState[y * 2 + (x > 16)] >> (x * 2) - ((x > 16) * 16) & 3);
+      return (this.clipState[y * 2 + (x > 16)] >> (x - ((x > 16) * 16)) * 2) & 3;
     };
+  }
+
+  setClipState(x, y, state) {
+    if (this.isPositionValid(x, y)) {
+      // * f!ing bit shenanigans
+      // * clear current state with mask 
+      // console.log(state);
+      let shift = (x - (x>16)*16)*2;
+      // console.log(shift);
+      // console.log(this.clipState[(y*2) + (x > 16)]);
+      this.clipState[(y * 2) + (x > 16)] = ((this.clipState[(y * 2) + (x > 16)] & (~3 << shift )) | ((state % 4) << shift))
+      // console.log(this.clipState[(y*2) + (x > 16)]);
+    }
   }
 
   toString() {
@@ -123,20 +136,22 @@ class Field {
       string += "\n";
       for (let j = 0; j < this.size; j++) {
         if ((this.fieldActive[i] & (1 << j)) != 0)
-          // string += (this.fieldState[i] & (1 << j)) != 0 ? "o" : " ";
-          if (this.fieldState[i] & (1 << j) != 0) string += 'o';
+          if ((this.fieldState[i] & (1 << j)) != 0) string += 'o';
           else {
             switch (this.getClipState(j, i)) {
               case 0: string += '1';
                 break;
-              case 1:string += '2';
+              case 1: string += '2';
                 break;
-              case 2:string += '3';
+              case 2: string += '3';
                 break;
-              case 3:string += '4';
+              case 3: string += '4';
                 break;
             }
           }
+        else {
+          string += ' ';
+        }
       }
     }
     return string;

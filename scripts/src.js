@@ -3,6 +3,7 @@
 import { generateField } from './view.js';
 import Field from './field.js';
 import { GAInstance, GASearch } from './search.js';
+import TylingField from './tyling_field.js';
 
 
 // generateField(new Field(4));
@@ -14,21 +15,81 @@ if (range.value) {
 else {
     generateField(11);
 }
-let field = new Field(7);
+let field = new Field(31);
 console.log(field.toString());
 console.log(field.getClipState(0,0));
-field.makeInactive(0,0);
-field.makeInactive(1,0);
-field.makeInactive(0,1);
-field.makeInactive(5,0);
-field.makeInactive(6,0);
-field.makeInactive(6,1);
-field.makeInactive(0,5);
-field.makeInactive(0,6);
-field.makeInactive(1,6);
-field.makeInactive(6,5);
-field.makeInactive(5,6);
-field.makeInactive(6,6);
-let empty = new GAInstance(field);
+field.setClipState(4,4,3);
+console.log(field.toString());
 
-console.log(empty);
+// console.log(field.getClipState(17,17));
+let empty = new TylingField(field);
+// console.log(field);
+// console.log(empty);
+// console.log(empty.score());
+// console.log(empty.toString());
+// let res = GASearch.findSolution(empty, 1);
+// empty = res[0];
+// empty.score();
+// // console.log(empty.score());
+// console.log(empty.toString());
+
+// res = GASearch.findSolution(empty, 2);
+// empty = res[0];
+// empty.score();
+// // console.log(empty.score());
+// console.log(empty.toString());
+
+let res = GASearch.findSolution(empty, 4);
+empty = res[0];
+// empty = empty.mutate();
+// empty = empty.mutate();
+// empty = empty.breed(empty);
+// empty = empty.mutate();
+// empty = empty.mutate();
+// empty = empty.mutate();
+// empty.score();
+// console.log(empty.score());
+// console.log(empty.score());
+// console.log(empty.score());
+// console.log(empty.toString());
+console.log(res[0].score());
+console.log(res[0].toString());
+
+res = GASearch.findSolution(empty, 2);
+empty = res[0];
+console.log(res[0].score());
+console.log(res[0].toString());
+// console.log(res[0].breed(res[1]));
+
+res = GASearch.findSolution(empty, 2);
+empty =empty.score() < res[0].score() ? res[0] : empty;
+console.log(res[0].score());
+console.log(res[0].toString());
+res = GASearch.findSolution(empty, 2);
+empty =empty.score() < res[0].score() ? res[0] : empty;
+console.log(res[0].score());
+console.log(res[0].toString());
+res = GASearch.findSolution(empty, 2);
+empty =empty.score() < res[0].score() ? res[0] : empty;
+console.log(res[0].score());
+console.log(res[0].toString());
+res = GASearch.findSolution(empty, 2);
+empty =empty.score() < res[0].score() ? res[0] : empty;
+console.log(res[0].score());
+console.log(res[0].toString());
+res = GASearch.findSolution(empty, 2);
+empty =empty.score() < res[0].score() ? res[0] : empty;
+console.log(res[0].score());
+console.log(res[0].toString());
+res = GASearch.findSolution(empty, 2);
+empty =empty.score() < res[0].score() ? res[0] : empty;
+console.log(res[0].score());
+console.log(res[0].toString());
+res = GASearch.findSolution(empty, 2);
+empty =empty.score() < res[0].score() ? res[0] : empty;
+console.log(res[0].score());
+console.log(res[0].toString());
+res = GASearch.findSolution(empty, 2);
+empty =empty.score() < res[0].score() ? res[0] : empty;
+console.log(res[0].score());
+console.log(res[0].toString());

@@ -1,3 +1,4 @@
+// import Field from "./field.js";
 import Field from "./field.js";
 import GAInstance from "./search.js";
 
@@ -48,11 +49,7 @@ class TylingField extends GAInstance {
   */
   doesFit(element){
     let test = this.getTestArray(element.type);
-    console.log(test);
     for(let val of test){
-      console.log(val);
-      console.log(element.x+val.x);
-      console.log(  this.isSet(element.x+val.x, element.y+val.y))
       if(!this.isActive(element.x+val.x,element.y+val.y) || this.isSet(element.x+val.x, element.y+val.y)) return false;
     }
     return true;
@@ -138,20 +135,10 @@ class TylingField extends GAInstance {
           if ((this.fieldLoaders[i] & (1 << j)) != 0) loaders += 'o';
           else {
             loaders+=' ';
-            // switch (this.getClipState(j, i)) {
-            //   case 0: string += '1';
-            //     break;
-            //   case 1:string += '2';
-            //     break;
-            //   case 2:string += '3';
-            //     break;
-            //   case 3:string += '4';
-            //     break;
-            // }
           }
         }else{ 
-          string += ' '
-          loaders += ' ';
+          string += '*'
+          loaders += '*';
         }
       }
     }
@@ -161,9 +148,10 @@ class TylingField extends GAInstance {
   breed(instance) {
     let clone = this.clone();
     let pool_B = [];
-    for(el of instance.pool_B){
+    for(let el of instance.pool_A){
       pool_B.push({'x':el.x, 'y':el.y, 'type':el.type});
     }
+    clone.pool_B = pool_B;
     return clone;
   }
 
@@ -187,9 +175,9 @@ class TylingField extends GAInstance {
 
   mutate() {
     let clone = this.clone();
-    let r = Math.ceil(Math.random() * 4);
+    let r = Math.ceil(Math.random() * 2);
     let size = this.size ** 2;
-    for (let i = r; i < size; i += 10) {
+    for (let i = 0; i < size; i++ ) {
       let x = Math.ceil(Math.random() * clone.size - 1);
       let y = Math.ceil(Math.random() * clone.size - 1);
       let t = Math.ceil(Math.random() * 3);
@@ -202,23 +190,28 @@ class TylingField extends GAInstance {
     let score = 0;
     let size = this.size ** 2;
 
+    for (let i = 0; i < this.size; i++) {
+      this.fieldState[i] = 0;
+      this.fieldLoaders[i] = 0;
+    }
+
     for (let i = 0; i < size; i++ ) {
       if(this.doesFit(this.pool_A[i])) {
-        console.log(this.pool_A[i])
-        console.log(this.doesFit(this.pool_A[i]));
         this.setType(this.pool_A[i]);
+        score+=1;
       }
       else if(this.doesFit(this.pool_B[i])) {
-        this.setType(this.pool_B[i])
+        this.setType(this.pool_B[i]);
+        score+=1;
       } 
     }
-    for (let y = 0; y < this.size; y++) {
-      for (let x = 0; x < this.size; x++) {
-        if (this.isLoaderSet(x, y)) {
-         score+=1; 
-        }
-      }
-    }
+    // for (let y = 0; y < this.size; y++) {
+    //   for (let x = 0; x < this.size; x++) {
+    //     if (this.isLoaderSet(x, y)) {
+    //      score+=1; 
+    //     }
+    //   }
+    // }
     return score;
   }
 

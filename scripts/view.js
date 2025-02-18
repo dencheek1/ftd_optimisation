@@ -76,6 +76,9 @@ function generateViewNode(field) {
         } else if (field.hasSetNeighbor(xIndex, yIndex)) {
           active++;
           cell.setAttribute("clip", "");
+          let val = field.getClipState(xIndex, yIndex);
+
+          cell.setAttribute('rotation', val)
         }
       }
       column.appendChild(cell);
@@ -143,7 +146,8 @@ function searchField() {
     const result = document.getElementsByClassName("results")[0];
     while (change-- > 0) {
       population = GASearch.findSolution(best);
-      if (best.score() < population[0].score()) {
+      console.log(population[0].optimisedScore(3));
+      if (best.optimisedScore(3) < population[0].optimisedScore(3)) {
         best = population[0];
         change = 55;
       }
@@ -160,9 +164,13 @@ function searchField() {
       worker.onmessage = (m) => {
         counter++;
         let solution = new GAInstance(m.data);
+        console.log(solution.toString());
+        console.log(solution.optimisedScore(3));
+        console.log(best.toString());
+        console.log(best.optimisedScore(3));
         if (
           best.equalField(solution) &&
-          solution.score() >= best.score() &&
+          solution.optimisedScore(3) >= best.optimisedScore(3) &&
           best.size == solution.size
         ) {
           best = solution;
