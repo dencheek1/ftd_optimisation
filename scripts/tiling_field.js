@@ -18,8 +18,7 @@ class TilingField extends GAInstance {
           this.pool_B[i + j * field.size] = { x: 0, y: 0, type: 0 };
         }
       }
-    }
-    else {
+    } else {
       this.pool_A = field.pool_A;
       this.pool_B = field.pool_B;
     }
@@ -94,7 +93,6 @@ class TilingField extends GAInstance {
           { x: 2, y: 0 },
           { x: 1, y: 3 },
           { x: 3, y: 2 },
-
         ];
     }
   }
@@ -126,10 +124,10 @@ class TilingField extends GAInstance {
       { x: 0, y: 1 },
     ];
     const type_3 = [
-      { x: 0, y: 1 },
-      { x: 1, y: 1 },
-      { x: 2, y: 1 },
+      { x: 0, y: 0 },
       { x: 1, y: 0 },
+      { x: 2, y: 0 },
+      { x: 1, y: -1 },
     ];
     const type_4 = [
       { x: 0, y: 0 },
@@ -151,7 +149,7 @@ class TilingField extends GAInstance {
       { x: 1, y: 3 },
       { x: 2, y: 3 },
       { x: 3, y: 3 },
-    ]
+    ];
     switch (type) {
       case 0:
         return type_0;
@@ -231,9 +229,9 @@ class TilingField extends GAInstance {
 
   mutate() {
     let clone = this.clone();
-    let r = Math.ceil(Math.random() * 2);
+    let r = Math.ceil(Math.random() * 4);
     let size = this.size ** 2;
-    for (let i = r; i < size; i+=4) {
+    for (let i = r; i < size; i += 4) {
       let x = Math.ceil(Math.random() * clone.size - 1);
       let y = Math.ceil(Math.random() * clone.size - 1);
       let t = Math.ceil(Math.random() * 4);
@@ -245,7 +243,7 @@ class TilingField extends GAInstance {
   score() {
     let score = 0;
     let size = this.size ** 2;
-
+    let free = [];
     for (let i = 0; i < this.size; i++) {
       this.fieldState[i] = 0;
       this.fieldLoaders[i] = 0;
@@ -254,19 +252,30 @@ class TilingField extends GAInstance {
     for (let i = 0; i < size; i++) {
       if (this.doesFit(this.pool_A[i])) {
         this.setType(this.pool_A[i]);
-        score += 1;
+        // score += 1;
       } else if (this.doesFit(this.pool_B[i])) {
         this.setType(this.pool_B[i]);
-        score += 1;
+        // score += 1;
+      } else free.push(i);
+    }
+    for (let y = 0; y < this.size; y++) {
+      for (let x = 0; x < this.size; x++) {
+        if (this.isActive(x, y) && this.isSet(x, y)) {
+          for (let type = 0; type < 4; type++) {
+            if (this.doesFit({ x: x, y: y, type: type })) {
+              let fr = free.pop();
+              if (fr) {
+                this.pool_B[fr] = { x: x, y: y, type: type };
+                this.setType(this.pool_B[fr]);
+              }
+            }
+          }
+        }
+        if (this.isLoaderSet(x, y)) {
+          score += 1;
+        }
       }
     }
-    // for (let y = 0; y < this.size; y++) {
-    //   for (let x = 0; x < this.size; x++) {
-    //     if (this.isLoaderSet(x, y)) {
-    //      score+=1;
-    //     }
-    //   }
-    // }
     return score;
   }
 
