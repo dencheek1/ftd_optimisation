@@ -180,7 +180,10 @@ function searchField() {
           best = solution;
           if (result && flag) {
             result.textContent = "";
-            result.appendChild(generateViewNode(best));
+            let view = new TilingField(best);
+            view.fieldState = view.fieldLoaders;
+            console.log(view);
+            result.appendChild(generateViewNode(view));
           }
         }
         if (flag) {

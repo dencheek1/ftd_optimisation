@@ -7,6 +7,7 @@ class TilingField extends GAInstance {
     //check if size < 32;
     super(field);
     this.fieldLoaders = [];
+    this.changed = true;
     if (field.pool_A == undefined) {
       this.pool_A = [field.size * field.size];
       this.pool_B = [field.size * field.size];
@@ -22,6 +23,7 @@ class TilingField extends GAInstance {
       this.pool_A = field.pool_A;
       this.pool_B = field.pool_B;
     }
+    this.recalculateField();
   }
 
   // // TODO refactor. Make normal looking conditions.
@@ -39,6 +41,7 @@ class TilingField extends GAInstance {
     if (this.isPositionValid(x, y)) {
       this.fieldLoaders[y] =
         (this.fieldLoaders[y] & ~(1 << x)) | (!!state << x);
+        this.changed = true;
     }
   }
 
@@ -71,9 +74,10 @@ class TilingField extends GAInstance {
     for (let val of test) {
       this.setState(element.x + val.x, element.y + val.y, true);
     }
-    for (let loader of test) {
+    for (let loader of main) {
       this.setLoader(element.x + loader.x, element.y + loader.y, true);
     }
+    this.changed = true;
   }
 
   getLoaderPosition(type) {
@@ -85,7 +89,7 @@ class TilingField extends GAInstance {
       case 2:
         return [{ x: 1, y: 1 }];
       case 3:
-        return [{ x: 1, y: 1 }];
+        return [{ x: 1, y: 0 }];
 
       case 4:
         return [
@@ -206,6 +210,8 @@ class TilingField extends GAInstance {
       pool_B.push({ x: el.x, y: el.y, type: el.type });
     }
     clone.pool_B = pool_B;
+    // clone.recalculateField();
+    clone.changed = true;
     return clone;
   }
 
@@ -237,13 +243,14 @@ class TilingField extends GAInstance {
       let t = Math.ceil(Math.random() * 4);
       clone.pool_A[i] = { x: x, y: y, type: t };
     }
+    // clone.recalculateField()
+    clone.changed = true;
     return clone;
   }
 
-  score() {
-    let score = 0;
-    let size = this.size ** 2;
-    let free = [];
+  recalculateField(){
+  let free = [];
+    let size = this.size**2;
     for (let i = 0; i < this.size; i++) {
       this.fieldState[i] = 0;
       this.fieldLoaders[i] = 0;
@@ -252,15 +259,13 @@ class TilingField extends GAInstance {
     for (let i = 0; i < size; i++) {
       if (this.doesFit(this.pool_A[i])) {
         this.setType(this.pool_A[i]);
-        // score += 1;
       } else if (this.doesFit(this.pool_B[i])) {
         this.setType(this.pool_B[i]);
-        // score += 1;
       } else free.push(i);
     }
     for (let y = 0; y < this.size; y++) {
       for (let x = 0; x < this.size; x++) {
-        if (this.isActive(x, y) && this.isSet(x, y)) {
+        if (this.isActive(x, y) && !this.isSet(x, y)) {
           for (let type = 0; type < 4; type++) {
             if (this.doesFit({ x: x, y: y, type: type })) {
               let fr = free.pop();
@@ -271,11 +276,27 @@ class TilingField extends GAInstance {
             }
           }
         }
+      }
+    }
+  }
+
+  score() {
+    if(this.changed){
+     this.recalculateField();
+     this.changed = false;
+    }
+    else{
+      return this.cached_score;
+    }
+    let score = 0;
+    for (let y = 0; y < this.size; y++) {
+      for (let x = 0; x < this.size; x++) {
         if (this.isLoaderSet(x, y)) {
           score += 1;
         }
       }
     }
+    this.cached_score = score;
     return score;
   }
 

@@ -15,23 +15,26 @@ if (range.value) {
 else {
     generateField(11);
 }
-let field = new Field(15);
+let field = new Field(4);
 console.log(field.toString());
 console.log(field.getClipState(0,0));
 field.setClipState(4,4,3);
 console.log(field.toString());
 
-console.log(field.getClipState(17,17));
+// console.log(field.getClipState(17,17));
 let empty = new TilingField(field);
-console.log(field);
-console.log(empty);
-console.log(empty.score());
-console.log(empty.toString());
-let res = GASearch.findSolution(empty, 1);
+// console.log(field);
+// console.log(empty);
+// console.log(empty.score());
+// console.log(empty.toString());
+let res = GASearch.findSolution(empty, 2);
 empty = res[0];
 empty.score();
-// console.log(empty.score());
+console.log(empty.score());
 console.log(empty.toString());
+empty.recalculateField();
+console.log(empty.toString());
+console.log(empty)
 
 // res = GASearch.findSolution(empty, 2);
 // empty = res[0];
