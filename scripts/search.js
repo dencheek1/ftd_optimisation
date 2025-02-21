@@ -178,18 +178,17 @@ class GASearch {
     for (let i = 5; i > 0; i--) {
       population.push(best.clone());
       population.push(second.clone());
-      population.push(last.clone());
       population.push(best.mutate());
       population.push(second.mutate());
       population.push(best.breed(second));
-      population.push(best.breed(last));
       population.push(second.breed(last));
+      population.push(second.breed(best));
     }
     let size = population.length;
     for (let i = 0; i < size - 8; i++) {
       for (let m = 0; m < mutationRate; m++) {
         population[i] = population[i].mutate();
-        population[i] = population[i].mutateClips();
+        // population[i] = population[i].mutateClips();
       }
     }
 
@@ -226,7 +225,7 @@ class GASearch {
     let size = population[0].size;
 
     console.time("solution cycle");
-    for (let i = size * size * 2 * mutationRate; i > 0; i--) {
+    for (let i = size * size * 2 ; i > 0; i--) {
       population = this.step(population, mutationRate);
     }
     console.timeEnd("solution cycle");

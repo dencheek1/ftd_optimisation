@@ -120,11 +120,10 @@ class Field {
     if (this.isPositionValid(x, y)) {
       // * f!ing bit shenanigans
       // * clear current state with mask 
-      // console.log(state);
       let shift = (x - (x>16)*16)*2;
-      // console.log(shift);
-      // console.log(this.clipState[(y*2) + (x > 16)]);
-      this.clipState[(y * 2) + (x > 16)] = ((this.clipState[(y * 2) + (x > 16)] & (~3 << shift )) | ((state % 4) << shift))
+      let index = (y * 2) + (x > 16)
+      let mask = ~(3 << shift );
+      this.clipState[index] = ((this.clipState[index] & mask) | ((state % 4) << shift))
       // console.log(this.clipState[(y*2) + (x > 16)]);
     }
   }
