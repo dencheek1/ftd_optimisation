@@ -5,14 +5,11 @@ import GAInstance from "./search.js";
 class TilingField extends GAInstance {
   constructor(field) {
     super(field);
-    this.fieldLoaders = [];
-    this.changed = true;
     if (field.pool_A == undefined) {
       this.pool_A = [field.size * field.size];
       this.pool_B = [field.size * field.size];
       for (let i = 0; i < field.size; i++) {
         this.fieldState[i] = 0;
-        this.fieldLoaders[i] = 0;
         for (let j = 0; j < field.size; j++) {
           this.pool_A[i + j * field.size] = { x: i, y: j, type: 0 };
           this.pool_B[i + j * field.size] = { x: i, y: j, type: 0 };
@@ -25,17 +22,6 @@ class TilingField extends GAInstance {
     this.recalculateField();
   }
 
-  setLoader(x, y, state) {
-    if (this.isPositionValid(x, y)) {
-      this.fieldLoaders[y] =
-        (this.fieldLoaders[y] & ~(1 << x)) | (!!state << x);
-      this.changed = true;
-    }
-  }
-
-  isLoaderSet(x, y) {
-    return this.isPositionValid(x, y) && !!(this.fieldLoaders[y] & (1 << x));
-  }
 
   /*
     for now just asume
@@ -62,7 +48,7 @@ class TilingField extends GAInstance {
     for (let val of test) {
       this.setState(element.x + val.x, element.y + val.y, true);
       let state =
-        val.x == loader.x 
+        val.x == loader.x
           ? val.y > loader.y
             ? 2
             : 0
@@ -70,11 +56,8 @@ class TilingField extends GAInstance {
           ? 1
           : 3;
       this.setClipState(element.x + val.x, element.y + val.y, state);
-
-      // console.log(`x: ${val.x + element.x} y ${val.y + element.y} vx: ${val.x} vy ${val.y} lx: ${loader.x} ly ${loader.y} state ${state}`)
     }
     this.setLoader(element.x + loader.x, element.y + loader.y, true);
-    console.log(this.toString())
     this.changed = true;
   }
 
@@ -88,6 +71,9 @@ class TilingField extends GAInstance {
         return { x: 1, y: 1 };
       case 3:
         return { x: 1, y: 0 };
+      // case 4: 
+      //   return { x: 1, y: 0}; 
+    
     }
   }
 
@@ -99,73 +85,79 @@ class TilingField extends GAInstance {
         10                01       111
   */
   getTestArray(type) {
-    const type_0 = [
-      { x: 0, y: 0 },
-      { x: 0, y: 1 },
-      { x: 0, y: 2 },
-      { x: 1, y: 1 },
-    ];
-    const type_1 = [
-      { x: 0, y: 0 },
-      { x: 1, y: 0 },
-      { x: 2, y: 0 },
-      { x: 1, y: 1 },
-    ];
-    const type_2 = [
-      { x: 1, y: 0 },
-      { x: 1, y: 1 },
-      { x: 1, y: 2 },
-      { x: 0, y: 1 },
-    ];
-    const type_3 = [
-      { x: 0, y: 0 },
-      { x: 1, y: 0 },
-      { x: 2, y: 0 },
-      { x: 1, y: -1 },
-    ];
     switch (type) {
       case 0:
-        return type_0;
+        return [
+          { x: 0, y: 0 },
+          { x: 0, y: 1 },
+          { x: 0, y: 2 },
+          { x: 1, y: 1 },
+        ];
 
       case 1:
-        return type_1;
+        return [
+          { x: 0, y: 0 },
+          { x: 1, y: 0 },
+          { x: 2, y: 0 },
+          { x: 1, y: 1 },
+        ];
 
       case 2:
-        return type_2;
+        return [
+          { x: 1, y: 0 },
+          { x: 1, y: 1 },
+          { x: 1, y: 2 },
+          { x: 0, y: 1 },
+        ];
 
       case 3:
-        return type_3;
+        return [
+          { x: 0, y: 0 },
+          { x: 1, y: 0 },
+          { x: 2, y: 0 },
+          { x: 1, y: -1 },
+        ];
+      // case 4:
+      //   return [
+      //     { x: 0, y: 0 },
+      //     { x: 1, y: 0 },
+      //     { x: 2, y: 0 },
+      //     { x: 1, y: -1 },
+      //     { x: 1, y: 1 },
+      //   ];
     }
-    // return type_0;
   }
 
   toString() {
     let string = "";
     let loaders = "";
-    // string += this.super.toString();
     string += "\n";
+    this.recalculateField();
     for (let i = 0; i < this.size; i++) {
       string += "\n";
       loaders += "\n";
       for (let j = 0; j < this.size; j++) {
         if ((this.fieldActive[i] & (1 << j)) != 0) {
-          if ((this.fieldLoaders[i] & (1 << j)) != 0) string += 'o';
-          else {
-            switch (this.getClipState(j, i)) {
-              case 0: string += '0';
-                break;
-              case 1: string += '1';
-                break;
-              case 2: string += '2';
-                break;
-              case 3: string += '3';
-                break;
-            }
-          }
           if ((this.fieldLoaders[i] & (1 << j)) != 0) loaders += "o";
           else {
             loaders += " ";
           }
+          if (this.isSet(j, i)) {
+            switch (this.getClipState(j, i)) {
+              case 0:
+                string += "1";
+                break;
+              case 1:
+                string += "2";
+                break;
+              case 2:
+                string += "3";
+                break;
+              case 3:
+                string += "4";
+                break;
+            }
+          } else string += " ";
         } else {
           string += "*";
           loaders += "*";
@@ -182,7 +174,6 @@ class TilingField extends GAInstance {
       pool_B.push({ x: el.x, y: el.y, type: el.type });
     }
     clone.pool_B = pool_B;
-    // clone.recalculateField();
     clone.changed = true;
     return clone;
   }
@@ -198,7 +189,7 @@ class TilingField extends GAInstance {
       clone.fieldActive[i] = this.fieldActive[i];
       clone.fieldLoaders[i] = this.fieldLoaders[i];
       clone.clipState[i * 2] = this.clipState[i * 2];
-      clone.clipState[(i * 2 )+ 1] = this.clipState[(i * 2) + 1];
+      clone.clipState[i * 2 + 1] = this.clipState[i * 2 + 1];
       for (let j = 0; j < clone.size; j++) {
         clone.pool_A[j + i * clone.size] = this.pool_A[j + i * clone.size];
         clone.pool_B[j + i * clone.size] = this.pool_B[j + i * clone.size];
@@ -217,7 +208,6 @@ class TilingField extends GAInstance {
       let t = Math.ceil(Math.random() * 3);
       clone.pool_A[i] = { x: x, y: y, type: t };
     }
-    // clone.recalculateField()
     clone.changed = true;
     return clone;
   }
@@ -274,7 +264,6 @@ class TilingField extends GAInstance {
   }
 
   //Field data representation?
-  fieldLoaders;
 
   //arrays
   pool_A;

@@ -1,9 +1,11 @@
 class Field {
   constructor(size) {
     //check if size < 32;
+    this.changed = true;
     this.size = size;
     this.fieldActive = [];
     this.fieldState = [];
+    this.fieldLoaders = [];
     //use 2 bits for a clip state
     this.clipState = [];
     for (let i = 0; i < size; i++) {
@@ -13,6 +15,7 @@ class Field {
       this.fieldState[i] = state;
       this.clipState[i * 2] = 0;
       this.clipState[i * 2 + 1] = 0;
+      this.fieldLoaders[i] = active;
     }
   }
 
@@ -21,8 +24,6 @@ class Field {
     if (field.size != this.size) return false;
     for (let i = 0; i < this.size; i++) {
       if (this.fieldActive[i] != field.fieldActive[i]) return false;
-      // if (this.clipState[i * 2] != field.clipState[i * 2]) return false;
-      // if (this.clipState[i * 2 + 1] != field.clipState[i * 2 + 1]) return false;
     }
     return true;
   }
@@ -30,7 +31,7 @@ class Field {
   optimalPattern(offset) {
     let state = 1108378657;
     for (let i = 0; i < this.size; i++) {
-      this.fieldState[i] = state << (2 * (i + (offset % 5))) % 5;
+      this.fieldLoaders[i] = state << (2 * (i + (offset % 5))) % 5;
     }
     return this;
   }
@@ -83,23 +84,27 @@ class Field {
   makeActive(x, y) {
     if (this.isPositionValid(x, y)) {
       this.fieldActive[y] = this.fieldActive[y] | (1 << y);
+      this.changed = true;
     }
   }
 
   makeInactive(x, y) {
     if (this.isPositionValid(x, y)) {
       this.fieldActive[y] = this.fieldActive[y] & ~(1 << x);
+      this.changed = true;
     }
   }
 
   toggleCell(x, y) {
     if (this.isPositionValid(x, y))
       this.fieldState[y] = this.fieldState[y] ^ (1 << x);
+    this.changed = true;
   }
 
   setState(x, y, state) {
     if (this.isPositionValid(x, y)) {
-      this.fieldState[y] = (this.fieldState[y] & ~(1 << x)) | (!!state << x);
+      this.fieldState[y] = (this.fieldState[y] & (~(1 << x))) | (!!state << x);
+      this.changed = true;
     }
   }
 
@@ -126,30 +131,69 @@ class Field {
       this.clipState[index] = ((this.clipState[index] & mask) | ((state % 4) << shift))
       // console.log(this.clipState[(y*2) + (x > 16)]);
     }
+    this.changed = true;
+  }
+
+  setLoader(x, y, state) {
+    if (this.isPositionValid(x, y)) {
+      this.fieldLoaders[y] =
+        (this.fieldLoaders[y] & ~(1 << x)) | (!!state << x);
+      this.changed = true;
+    }
+  }
+
+  isLoaderSet(x, y) {
+    return this.isPositionValid(x, y) && !!(this.fieldLoaders[y] & (1 << x));
+  }
+
+  recalculateField(){
+    // let size = this.size ** 2;
+    for (let i = 0; i < this.size; i++) {
+      this.fieldState[i] = 0;
+    }
+
+    for (let i = 0; i < this.size; i++) {
+      for(let j = 0; j < this.size; j++){
+        if(this.isActive(i,j) && this.isLoaderSet(i, j)){
+          this.setState(i + 1, j, true);
+          this.setState(i - 1, j, true);
+          this.setState(i, j + 1, true);
+          this.setState(i, j - 1, true);
+          this.setState(i, j, true);
+          
+          this.setClipState(i + 1,j,1);
+          this.setClipState(i - 1,j,3);
+          this.setClipState(i,j + 1,0);
+          this.setClipState(i,j - 1,2);
+        }
+      }
+    }
   }
 
   toString() {
     let string = "";
+    this.recalculateField()
 
     for (let i = 0; i < this.size; i++) {
       string += "\n";
       for (let j = 0; j < this.size; j++) {
         if ((this.fieldActive[i] & (1 << j)) != 0)
-          if ((this.fieldState[i] & (1 << j)) != 0) string += 'o';
-          else {
+          if ((this.fieldLoaders[i] & (1 << j)) != 0) string += 'o';
+          else if(this.isSet(j,i)){
             switch (this.getClipState(j, i)) {
-              case 0: string += '1';
+              case 0: string += '0';
                 break;
-              case 1: string += '2';
+              case 1: string += '1';
                 break;
-              case 2: string += '3';
+              case 2: string += '2';
                 break;
-              case 3: string += '4';
+              case 3: string += '3';
                 break;
             }
           }
+          else string += ' '
         else {
-          string += ' ';
+          string += '*';
         }
       }
     }
@@ -161,6 +205,7 @@ class Field {
   }
 
   //Field data representation?
+  fieldLoaders;
   size;
   fieldState;
   fieldActive;

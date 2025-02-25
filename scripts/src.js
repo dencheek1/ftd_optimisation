@@ -15,17 +15,25 @@ if (range.value) {
 else {
     generateField(11);
 }
-let field = new Field(4);
-console.log(field.toString());
-console.log(field.getClipState(0,0));
+let field = new Field(5);
 // field.setClipState(4,4,3);
-console.log(field.toString());
 
 // console.log(field.getClipState(17,17));
-let empty = new TilingField(field);
+let empty = new GAInstance(field);
 empty = GASearch.findSolution(empty,2)[0];
 
-console.log(empty.toString());
+console.log('\n')
+// empty.recalculateField();
+console.log(empty.toString())
+empty = empty.mutate();
+console.log(empty)
 empty.recalculateField();
-console.log(empty.toString());
+console.log(empty.score());
+console.log(empty.toString())
+    empty.setLoader(0, 0, !empty.isLoaderSet(0,0));
 empty.recalculateField();
+console.log(empty.toString())
+console.log(empty.score());
+    empty.setLoader(0, 0, !empty.isLoaderSet(0,0));
+console.log(empty.toString());
+// empty.recalculateField();

@@ -12,6 +12,7 @@ function drawEvent(e) {
 let flag = false;
 let counter = 0;
 let best;
+let type = 'price';
 
 let worker = [];
 if (window.Worker) {
@@ -71,10 +72,10 @@ function generateViewNode(field) {
       if (!field.isActive(xIndex, yIndex)) {
         cell.setAttribute("disabled", "");
       } else {
-        if (field.isSet(xIndex, yIndex)) {
+        if (field.isLoaderSet(xIndex, yIndex)) {
           score++;
           cell.setAttribute("active", "");
-        } else if (field.hasSetNeighbor(xIndex, yIndex)) {
+        } else if (field.isSet(xIndex, yIndex) &&  field.hasSetNeighbor(xIndex, yIndex) ) {
           active++;
           cell.setAttribute("clip", "");
           let val = field.getClipState(xIndex, yIndex);
@@ -140,7 +141,7 @@ function searchField() {
   if (flag) {
     let f = Field.fieldFromView(fieldView);
 
-    let gaInstance = new TilingField(f);
+    let gaInstance = new GAInstance(f);
 
     if (best == undefined || !best.equalField(gaInstance)) best = gaInstance; //population[0]
     let change = 0;
@@ -160,29 +161,21 @@ function searchField() {
     //   }
     // }
     if (window.Worker) {
-      // console.log(new GAInstance(f))
-      worker.postMessage(new TilingField(f));
+      worker.postMessage([new GAInstance(f),type]);
       worker.onmessage = (m) => {
         counter++;
-        console.log(m)
-        let solution = new TilingField(m.data);
-        solution.score();
-        console.log(solution);
-        console.log(solution.toString());
-        // console.log(solution.score(3));
-        // console.log(best.toString());
-        // console.log(best.score(3));
+        let solution = new GAInstance(m.data);
         if (
           best.equalField(solution) &&
           solution.score() >= best.score() &&
           best.size == solution.size
         ) {
           best = solution;
+          console.log(best);
           if (result && flag) {
             result.textContent = "";
-            let view = new TilingField(best);
-            view.fieldState = view.fieldLoaders;
-            console.log(view);
+            let view = new GAInstance(best);
+            // view.fieldState = view.fieldLoaders;
             result.appendChild(generateViewNode(view));
           }
         }
@@ -200,6 +193,8 @@ function searchField() {
     }
   } else {
     counter = 0;
+    worker.terminate();
+    worker = new Worker("scripts/webworker.js", { type: "module" });
   }
 }
 

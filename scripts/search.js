@@ -12,6 +12,7 @@ class GAInstance extends Field {
       this.fieldActive = field.fieldActive;
       this.fieldState = field.fieldState;
       this.clipState = field.clipState;
+      this.fieldLoaders = field.fieldLoaders;
     }
   }
 
@@ -20,10 +21,8 @@ class GAInstance extends Field {
     let clone = this.clone();
     for (let i = 0; i < clone.size; i++) {
       clone.fieldState[i] =
-        (this.fieldState[i] & (mask >> ((i + 1) & 1))) |
-        (instance.fieldState[i] & (mask >> (i & 1)));
-        // clone.clipState[i*2] = this.clipState[i*2];
-        // clone.clipState[i*2 +1] = instance.clipState[i*2 + 1];
+        (this.fieldLoaders[i] & (mask >> ((i + 1) & 1))) |
+        (instance.fieldLoaders[i] & (mask >> (i & 1)));
     }
     return clone;
   }
@@ -35,6 +34,7 @@ class GAInstance extends Field {
   clone() {
     let clone = new GAInstance(new Field(this.size));
     for (let i = 0; i < clone.size; i++) {
+      clone.fieldLoaders[i] = this.fieldLoaders[i];
       clone.fieldState[i] = this.fieldState[i];
       clone.fieldActive[i] = this.fieldActive[i];
       clone.clipState[i * 2] = this.clipState[i * 2];
@@ -53,19 +53,29 @@ class GAInstance extends Field {
       y = Math.ceil(Math.random() * clone.size - 1);
       counter--;
     }
-    clone.toggleCell(x, y);
-    if(clone.hasSetNeighbor(x,y)){
-      if(clone.isSet(x,y-1))
-      clone.setClipState(x,y,0)
-      if(clone.isSet(x,y+1))
-      clone.setClipState(x,y,2)
-      if(clone.isSet(x -1,y))
-      clone.setClipState(x,y,3)
-      if(clone.isSet(x + 1,y))
-      clone.setClipState(x,y,1)
-    }
+    clone.setLoader(x, y, !this.isLoaderSet(x,y));
+    clone.setClipState(x + 1,y,1);
+    clone.setClipState(x - 1,y,3);
+    clone.setClipState(x,y + 1,0);
+    clone.setClipState(x,y - 1,2);
+    clone.setState(x + 1,y,true);
+    clone.setState(x - 1,y,true);
+    clone.setState(x,y + 1,true);
+    clone.setState(x,y - 1,true);
+    clone.setState(x,y,true);
+    // if(clone.hasSetNeighbor(x,y)){
+    //   if(clone.isSet(x,y-1))
+    //   clone.setClipState(x,y,0)
+    //   if(clone.isSet(x,y+1))
+    //   clone.setClipState(x,y,2)
+    //   if(clone.isSet(x -1,y))
+    //   clone.setClipState(x,y,3)
+    //   if(clone.isSet(x + 1,y))
+    //   clone.setClipState(x,y,1)
+    // }
     return clone;
   }
+
 
   mutateClips() {
     let clone = this.clone();
@@ -83,80 +93,22 @@ class GAInstance extends Field {
   }
 
   score() {
+    if(this.changed){
+      this.recalculateField();
+      this.changed = false;
+    }
     let score = 0;
     for (let y = 0; y < this.size; y++) {
       for (let x = 0; x < this.size; x++) {
         if (this.isActive(x, y)) {
-          if (this.isSet(x, y)) {
+          if (this.isLoaderSet(x, y)) {
             score += 1;
-          } else if (this.hasSetNeighbor(x, y)) {
+          } else if (this.isSet(x,y)) {
             score += 2; // - temp;
           } else score -= 2;
         }
       }
     }
-    return score;
-  }
-
-  optimisedScore(num) {
-    let score = 0;
-    let count = {};
-    //todo count groups with proper sets
-    for (let y = 0; y < this.size; y++) {
-      for (let x = 0; x < this.size; x++) {
-        if (this.isActive(x, y)) {
-          if (this.isSet(x, y)) {
-            score += 1;
-          } else {
-            let val;
-            switch (this.getClipState(x, y)) {
-              case 0:
-                {
-                  val = this.isSet(x, y - 1);
-                  score += 2 * val;
-                  let index = (x << 6) | (y - 1);
-                  if (val) count[index] = count[index] ? count[index] + 1 : 1;
-                }
-                break;
-              case 1:
-                {
-                  val = this.isSet(x + 1, y);
-                  score += 2 * val;
-                  let index = ((x + 1) << 6) | y;
-                  if (val) count[index] = count[index] ? count[index] + 1 : 1;
-                }
-                break;
-              case 2:
-                {
-                  val = this.isSet(x, y + 1);
-                  score += 2 * val;
-                  let index = (x << 6) | (y + 1);
-                  if (val) count[index] = count[index] ? count[index] + 1 : 1;
-                }
-                break;
-              case 3:
-                {
-                  val = this.isSet(x - 1, y);
-                  score += 2 * val;
-                  let index = ((x - 1) << 6) | y;
-                  if (val) count[index] = count[index] ? count[index] + 1 : 1;
-                }
-                break;
-              default: score -= 1;
-            }
-          }
-        }
-      }
-    }
-    for (let el in count) {
-      // console.log('el ' + el)
-      // console.log('count ' +count[el])
-      if (count[el] == num) score += 8;
-      // else if(count[el] == num-1  || count[el] == num + 1) score +=2;
-      // else score -=2;
-
-    }
-
     return score;
   }
 }
