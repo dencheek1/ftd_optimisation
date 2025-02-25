@@ -138,25 +138,29 @@ class TilingField extends GAInstance {
       loaders += "\n";
       for (let j = 0; j < this.size; j++) {
         if ((this.fieldActive[i] & (1 << j)) != 0) {
-          if ((this.fieldLoaders[i] & (1 << j)) != 0) loaders += "o";
+          if ((this.fieldLoaders[i] & (1 << j)) != 0){
+             loaders += "o";
+          }
           else {
             loaders += " ";
           }
-          if (this.isSet(j, i)) {
+          if (this.isSet(j, i) && !this.isLoaderSet(j,i)) {
             switch (this.getClipState(j, i)) {
               case 0:
-                string += "1";
+                string += "0";
                 break;
               case 1:
-                string += "2";
+                string += "1";
                 break;
               case 2:
-                string += "3";
+                string += "2";
                 break;
               case 3:
-                string += "4";
+                string += "3";
                 break;
             }
+          } else if(this.isLoaderSet(j, i)){
+            string+='o';
           } else string += " ";
         } else {
           string += "*";

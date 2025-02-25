@@ -12,15 +12,42 @@ function drawEvent(e) {
 let flag = false;
 let counter = 0;
 let best;
-let type = 'price';
+let type = 'pattern';
 
 let worker = [];
 if (window.Worker) {
-  worker = new Worker("scripts/webworker.js", { type: "module" });
-  // worker[0] = new Worker("scripts/webworker.js", { type: "module" });
-  // worker[1] = new Worker("scripts/webworker.js", { type: "module" });
-  // worker[2] = new Worker("scripts/webworker.js", { type: "module" });
+  worker[0] = new Worker("scripts/webworker.js", { type: "module" });
+  worker[1] = new Worker("scripts/webworker.js", { type: "module" });
+  worker[2] = new Worker("scripts/webworker.js", { type: "module" });
 }
+
+const onWorkerMessage = ( getBest, updateBest, type, counter, result, flag, inst, worker) =>{
+       return (m) =>{ counter++;
+        let solution = new inst(m.data);
+        
+          updateBest(solution);
+          if (result && flag) {
+            result.textContent = "";
+            let view = new inst(best);
+            result.appendChild(generateViewNode(view));
+          }
+        
+        if (flag) {
+          if (counter % 2 == 0) {
+            let empty = getBest().clone();
+            for(let i = 0; i < empty.size; i++){
+              empty.fieldState[i] = 0;
+              empty.fieldLoaders[i] = 0;
+            }
+            worker.postMessage([empty, type]);
+          } else if (counter % 5 == 0) {
+            let pattern = getBest().clone();
+            pattern.optimalPattern(counter / 5);
+            worker.postMessage([pattern, type]);
+          } else worker.postMessage([getBest(), type]);
+        }
+      }
+};
 
 function generateField(size) {
   //TODO reverse dependencie, create data model based on field view
@@ -75,7 +102,7 @@ function generateViewNode(field) {
         if (field.isLoaderSet(xIndex, yIndex)) {
           score++;
           cell.setAttribute("active", "");
-        } else if (field.isSet(xIndex, yIndex) &&  field.hasSetNeighbor(xIndex, yIndex) ) {
+        } else if (field.isSet(xIndex, yIndex) ) {
           active++;
           cell.setAttribute("clip", "");
           let val = field.getClipState(xIndex, yIndex);
@@ -91,7 +118,6 @@ function generateViewNode(field) {
   let div = document.createElement("div");
   div.setAttribute("class", "info__item");
   div.textContent = "autoloaders " + score;
-  console.log(div.innerText);
   info.appendChild(div.cloneNode(true));
   div.textContent = "clips " + active;
   info.appendChild(div.cloneNode(true));
@@ -108,7 +134,6 @@ function generateViewNode(field) {
   info.appendChild(div.cloneNode(true));
   div.textContent = "8 m " + (active * 320 + score * 480);
   info.appendChild(div.cloneNode(true));
-  // node.append(info);
   wrapper.appendChild(node);
   wrapper.appendChild(info);
   return wrapper;
@@ -124,7 +149,6 @@ function toggleCell(e) {
     e.target.removeAttribute("disabled");
   } else {
     e.target.setAttribute("disabled", "");
-    // e.target.removeAttribute("disabled");
   }
 }
 
@@ -132,7 +156,6 @@ function resetField() {
   fieldView.childNodes.forEach((fc) =>
     fc.childNodes.forEach((c) => c.removeAttribute("disabled"))
   );
-  // field.textContent = '';
 }
 function searchField() {
   flag = !flag;
@@ -140,61 +163,40 @@ function searchField() {
 
   if (flag) {
     let f = Field.fieldFromView(fieldView);
-
-    let gaInstance = new GAInstance(f);
+    let inst = type == 'pattern' ? TilingField: GAInstance
+    let gaInstance = new inst(f);
 
     if (best == undefined || !best.equalField(gaInstance)) best = gaInstance; //population[0]
     let change = 0;
     const result = document.getElementsByClassName("results")[0];
-    // while (change-- > 0) {
-    //   population = GASearch.findSolution(best);
-    //   // console.log(population[0].score(3));
-    //   if (best.score(3) < population[0].score(3)) {
-    //     best = population[0];
-    //     change = 55;
-    //   }
 
-    //   let view = generateViewNode(best);
-    //   if (result) {
-    //     result.textContent = "";
-    //     result.appendChild(view);
-    //   }
-    // }
     if (window.Worker) {
-      worker.postMessage([new GAInstance(f),type]);
-      worker.onmessage = (m) => {
-        counter++;
-        let solution = new GAInstance(m.data);
-        if (
-          best.equalField(solution) &&
-          solution.score() >= best.score() &&
-          best.size == solution.size
-        ) {
-          best = solution;
-          console.log(best);
-          if (result && flag) {
-            result.textContent = "";
-            let view = new GAInstance(best);
-            // view.fieldState = view.fieldLoaders;
-            result.appendChild(generateViewNode(view));
-          }
-        }
-        if (flag) {
-          if (counter % 2 == 0) {
-            worker.postMessage(gaInstance.clone());
-          } else if (counter % 5 == 0) {
-            let pattern = gaInstance.clone();
-            pattern.optimalPattern(counter / 5);
-            worker.postMessage(pattern);
-          } else worker.postMessage(best);
-        }
-      };
-      worker.onerror = (e) => console.log(e.message);
+      let updateBest = (b) => {
+        console.log(b.toString())
+        if (best.equalField(b) && best.score() <= b.score()) best = b;
+      }
+      let getBest = () => {
+        return best;
+      }
+
+      worker[0].postMessage([new GAInstance(f),type]);
+      worker[0].onmessage = onWorkerMessage(getBest, updateBest, type, counter, result, flag, inst, worker[0]);
+      worker[0].onerror = (e) => console.log(e.message);
+      worker[1].postMessage([new GAInstance(f),type]);
+      worker[1].onmessage = onWorkerMessage(getBest, updateBest, type, counter, result, flag, inst, worker[1]);
+      worker[1].onerror = (e) => console.log(e.message);
+      worker[2].postMessage([new GAInstance(f),type]);
+      worker[2].onmessage = onWorkerMessage(getBest, updateBest, type, counter, result, flag, inst, worker[2]);
+      worker[2].onerror = (e) => console.log(e.message);
     }
   } else {
     counter = 0;
-    worker.terminate();
-    worker = new Worker("scripts/webworker.js", { type: "module" });
+    worker[0].terminate();
+    worker[0] = new Worker("scripts/webworker.js", { type: "module" });
+    worker[1].terminate();
+    worker[1] = new Worker("scripts/webworker.js", { type: "module" });
+    worker[2].terminate();
+    worker[2] = new Worker("scripts/webworker.js", { type: "module" });
   }
 }
 

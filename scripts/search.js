@@ -56,8 +56,8 @@ class GAInstance extends Field {
     clone.setLoader(x, y, !this.isLoaderSet(x,y));
     clone.setClipState(x + 1,y,1);
     clone.setClipState(x - 1,y,3);
-    clone.setClipState(x,y + 1,0);
-    clone.setClipState(x,y - 1,2);
+    clone.setClipState(x,y + 1,2);
+    clone.setClipState(x,y - 1,0);
     clone.setState(x + 1,y,true);
     clone.setState(x - 1,y,true);
     clone.setState(x,y + 1,true);

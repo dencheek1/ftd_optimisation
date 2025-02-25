@@ -163,8 +163,8 @@ class Field {
           
           this.setClipState(i + 1,j,1);
           this.setClipState(i - 1,j,3);
-          this.setClipState(i,j + 1,0);
-          this.setClipState(i,j - 1,2);
+          this.setClipState(i,j + 1,2);
+          this.setClipState(i,j - 1,0);
         }
       }
     }
