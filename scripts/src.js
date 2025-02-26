@@ -20,12 +20,18 @@ let field = new Field(5);
 
 // console.log(field.getClipState(17,17));
 let empty = new TilingField(field);
+empty.setRange(4,4);
+console.log(empty)
+console.log(empty.toString())
+empty.updateField()
+console.log(empty)
+console.log(empty.toString())
 empty = GASearch.findSolution(empty,6)[0];
-console.log(empty.toString())
-console.log(empty.score());
-empty = empty.mutate();
-console.log(empty.toString())
-console.log(empty.score());
-empty = empty.mutate();
-console.log(empty.toString())
-console.log(empty.score());
+// console.log(empty.toString())
+// console.log(empty.score());
+// empty = empty.mutate();
+// console.log(empty.toString())
+// console.log(empty.score());
+// empty = empty.mutate();
+// console.log(empty.toString())
+// console.log(empty.score());

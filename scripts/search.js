@@ -87,14 +87,13 @@ class GAInstance extends Field {
       y = Math.ceil(Math.random() * clone.size - 1);
       counter--;
     }
-    // console.log('x ' + x + ' y ' + y + 'val ' + val)
     clone.setClipState(x, y, (Math.random() * 4) % 4);
     return clone;
   }
 
   score() {
     if(this.changed){
-      this.recalculateField();
+      this.updateField();
       this.changed = false;
     }
     let score = 0;
@@ -135,6 +134,7 @@ class GASearch {
       population.push(best.breed(second));
       population.push(second.breed(last));
       population.push(second.breed(best));
+      population.push(last.breed(best));
     }
     let size = population.length;
     for (let i = 0; i < size - 8; i++) {

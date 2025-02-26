@@ -12,7 +12,7 @@ function drawEvent(e) {
 let flag = false;
 let counter = 0;
 let best;
-let type = 'pattern';
+let type = '';
 
 let worker = [];
 if (window.Worker) {
@@ -21,37 +21,45 @@ if (window.Worker) {
   worker[2] = new Worker("scripts/webworker.js", { type: "module" });
 }
 
-const onWorkerMessage = ( getBest, updateBest, type, counter, result, flag, inst, worker) =>{
-       return (m) =>{ counter++;
-        let solution = new inst(m.data);
-        
-          updateBest(solution);
-          if (result && flag) {
-            result.textContent = "";
-            let view = new inst(best);
-            result.appendChild(generateViewNode(view));
-          }
-        
-        if (flag) {
-          if (counter % 2 == 0) {
-            let empty = getBest().clone();
-            for(let i = 0; i < empty.size; i++){
-              empty.fieldState[i] = 0;
-              empty.fieldLoaders[i] = 0;
-            }
-            worker.postMessage([empty, type]);
-          } else if (counter % 5 == 0) {
-            let pattern = getBest().clone();
-            pattern.optimalPattern(counter / 5);
-            worker.postMessage([pattern, type]);
-          } else worker.postMessage([getBest(), type]);
+const onWorkerMessage = (
+  getBest,
+  updateBest,
+  type,
+  counter,
+  result,
+  flag,
+  inst,
+  worker
+) => {
+  return (m) => {
+    counter++;
+    let solution = new inst(m.data);
+
+    updateBest(solution);
+    if (result && flag) {
+      result.textContent = "";
+      let view = new inst(best);
+      result.appendChild(generateViewNode(view));
+    }
+
+    if (flag) {
+      if (counter % 2 == 0) {
+        let empty = getBest().clone();
+        for (let i = 0; i < empty.size; i++) {
+          empty.fieldState[i] = 0;
+          empty.fieldLoaders[i] = 0;
         }
-      }
+        worker.postMessage([empty, type]);
+      } else if (counter % 5 == 0) {
+        let pattern = getBest().clone();
+        pattern.optimalPattern(counter / 5);
+        worker.postMessage([pattern, type]);
+      } else worker.postMessage([getBest(), type]);
+    }
+  };
 };
 
 function generateField(size) {
-  //TODO reverse dependencie, create data model based on field view
-  // * would be nice to have methods for two ways
   let cellSize = "normal";
   cellSize = size < 9 ? "large" : size > 16 ? "small" : "normal";
   for (let xIndex = 0; xIndex < size; xIndex++) {
@@ -102,12 +110,12 @@ function generateViewNode(field) {
         if (field.isLoaderSet(xIndex, yIndex)) {
           score++;
           cell.setAttribute("active", "");
-        } else if (field.isSet(xIndex, yIndex) ) {
+        } else if (field.isSet(xIndex, yIndex)) {
           active++;
           cell.setAttribute("clip", "");
           let val = field.getClipState(xIndex, yIndex);
 
-          cell.setAttribute('rotation', val)
+          cell.setAttribute("rotation", val);
         }
       }
       column.appendChild(cell);
@@ -157,36 +165,72 @@ function resetField() {
     fc.childNodes.forEach((c) => c.removeAttribute("disabled"))
   );
 }
+
+//TODO make it look sain, only idiot could write this
 function searchField() {
   flag = !flag;
   document.getElementById("search").textContent = flag ? "stop" : "search";
 
   if (flag) {
     let f = Field.fieldFromView(fieldView);
-    let inst = type == 'pattern' ? TilingField: GAInstance
+    let inst = type.startsWith('pattern') ? TilingField : GAInstance;
+    console.log(inst)
     let gaInstance = new inst(f);
 
-    if (best == undefined || !best.equalField(gaInstance)) best = gaInstance; //population[0]
+    if (best == undefined || !best.equalField(gaInstance)) {
+      best = gaInstance;
+      if(best ){
+        if(type == 'pattern_2') best.setRange(5,10);
+        if(type == 'pattern_3') best.setRange(0,3);
+        if(type == 'pattern_4') best.setRange(4,4);
+      }
+    }
     let change = 0;
     const result = document.getElementsByClassName("results")[0];
 
     if (window.Worker) {
       let updateBest = (b) => {
-        console.log(b.toString())
         if (best.equalField(b) && best.score() <= b.score()) best = b;
-      }
+      };
       let getBest = () => {
         return best;
-      }
+      };
 
-      worker[0].postMessage([new GAInstance(f),type]);
-      worker[0].onmessage = onWorkerMessage(getBest, updateBest, type, counter, result, flag, inst, worker[0]);
+      worker[0].postMessage([new GAInstance(f), type]);
+      worker[0].onmessage = onWorkerMessage(
+        getBest,
+        updateBest,
+        type,
+        counter,
+        result,
+        flag,
+        inst,
+        worker[0]
+      );
       worker[0].onerror = (e) => console.log(e.message);
-      worker[1].postMessage([new GAInstance(f),type]);
-      worker[1].onmessage = onWorkerMessage(getBest, updateBest, type, counter, result, flag, inst, worker[1]);
+      worker[1].postMessage([new GAInstance(f), type]);
+      worker[1].onmessage = onWorkerMessage(
+        getBest,
+        updateBest,
+        type,
+        counter,
+        result,
+        flag,
+        inst,
+        worker[1]
+      );
       worker[1].onerror = (e) => console.log(e.message);
-      worker[2].postMessage([new GAInstance(f),type]);
-      worker[2].onmessage = onWorkerMessage(getBest, updateBest, type, counter, result, flag, inst, worker[2]);
+      worker[2].postMessage([new GAInstance(f), type]);
+      worker[2].onmessage = onWorkerMessage(
+        getBest,
+        updateBest,
+        type,
+        counter,
+        result,
+        flag,
+        inst,
+        worker[2]
+      );
       worker[2].onerror = (e) => console.log(e.message);
     }
   } else {
@@ -220,6 +264,51 @@ const increaseSize = () => {
   }
 };
 
+//TODO get rid of copypaste functions
+const togglePattern_2 = (e) => {
+  if (type =='pattern_2') {
+    pattern_2.removeAttribute("active");
+    type = '';
+  } else {
+    type = 'pattern_2';
+    pattern_2.setAttribute("active", "");
+    pattern_4.removeAttribute("active");
+    pattern_3.removeAttribute("active");
+  }
+    flag = true;
+    best = undefined;
+    searchField();
+};
+
+const togglePattern_3 = (e) => {
+  if (type =='pattern_3') {
+    pattern_3.removeAttribute("active");
+    type = '';
+  } else {
+    type = 'pattern_3';
+    pattern_3.setAttribute("active", "");
+    pattern_2.removeAttribute("active");
+    pattern_4.removeAttribute("active");
+  }
+    flag = true;
+    best = undefined;
+    searchField();
+};
+
+const togglePattern_4 = (e) => {
+  if (type =='pattern_4') {
+    pattern_4.removeAttribute("active");
+    type = '';
+  } else {
+    type = 'pattern_4';
+    pattern_4.setAttribute("active", "");
+    pattern_3.removeAttribute("active");
+    pattern_2.removeAttribute("active");
+  }
+    flag = true;
+    best = undefined;
+    searchField();
+};
 const reset = document.getElementsByClassName("input__reset-button")[0];
 if (reset) reset.addEventListener("mouseup", resetField);
 const search = document.getElementsByClassName("input__search-button")[0];
@@ -228,6 +317,12 @@ const increase = document.getElementById("size-increase");
 if (increase) increase.addEventListener("mouseup", increaseSize);
 const decrease = document.getElementById("size-decrease");
 if (decrease) decrease.addEventListener("mouseup", decreaseSize);
+const pattern_2 = document.getElementById("pattern_2");
+if (pattern_2) pattern_2.addEventListener("mouseup", togglePattern_2);
+const pattern_3 = document.getElementById("pattern_3");
+if (pattern_3) pattern_3.addEventListener("mouseup", togglePattern_3);
+const pattern_4 = document.getElementById("pattern_4");
+if (pattern_4) pattern_4.addEventListener("mouseup", togglePattern_4);
 
 function isTouchPointer() {
   return matchMedia("(pointer: coarse)").matches;

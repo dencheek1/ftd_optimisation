@@ -146,7 +146,7 @@ class Field {
     return this.isPositionValid(x, y) && !!(this.fieldLoaders[y] & (1 << x));
   }
 
-  recalculateField(){
+  updateField(){
     // let size = this.size ** 2;
     for (let i = 0; i < this.size; i++) {
       this.fieldState[i] = 0;
@@ -172,7 +172,7 @@ class Field {
 
   toString() {
     let string = "";
-    this.recalculateField()
+    this.updateField()
 
     for (let i = 0; i < this.size; i++) {
       string += "\n";

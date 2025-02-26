@@ -5,23 +5,33 @@ import GAInstance from "./search.js";
 class TilingField extends GAInstance {
   constructor(field) {
     super(field);
+    this.range_start = field.range_start ?? 0;
+    this.range_end = field.range_end ?? 3;
+
     if (field.pool_A == undefined) {
       this.pool_A = [field.size * field.size];
       this.pool_B = [field.size * field.size];
       for (let i = 0; i < field.size; i++) {
         this.fieldState[i] = 0;
         for (let j = 0; j < field.size; j++) {
-          this.pool_A[i + j * field.size] = { x: i, y: j, type: 0 };
-          this.pool_B[i + j * field.size] = { x: i, y: j, type: 0 };
+          this.pool_A[i + j * field.size] = {
+            x: i,
+            y: j,
+            type: this.range_start,
+          };
+          this.pool_B[i + j * field.size] = {
+            x: i,
+            y: j,
+            type: this.range_start,
+          };
         }
       }
     } else {
       this.pool_A = field.pool_A;
       this.pool_B = field.pool_B;
     }
-    this.recalculateField();
+    this.updateField();
   }
-
 
   /*
     for now just asume
@@ -40,6 +50,24 @@ class TilingField extends GAInstance {
         return false;
     }
     return true;
+  }
+
+  setRange(start, end) {
+    this.range_start = start;
+    this.range_end = end;
+    let size = this.size ** 2;
+    for (let i = 0; i < size; i++) {
+      if (
+        this.pool_A[i].type < this.range_start ||
+        this.pool_A.type > this.range_end
+      )
+        this.pool_A[i].type = this.range_start;
+      if (
+        this.pool_B[i].type < this.range_start ||
+        this.pool_B.type > this.range_end
+      )
+        this.pool_B[i].type = this.range_start;
+    }
   }
 
   setType(element) {
@@ -71,18 +99,29 @@ class TilingField extends GAInstance {
         return { x: 1, y: 1 };
       case 3:
         return { x: 1, y: 0 };
-      // case 4: 
-      //   return { x: 1, y: 0}; 
-    
+      case 4:
+        return { x: 1, y: 0 };
+      case 5:
+        return { x: 0, y: 1 };
+      case 6:
+        return { x: 0, y: 0 };
+      case 7:
+        return { x: 1, y: 0 };
+      case 8:
+        return { x: 1, y: 0 };
+      case 9:
+        return { x: 0, y: 1 };
+      case 10:
+        return { x: 1, y: 0 };
     }
   }
 
   /*
     for now just asume
         
-        10      111       01
-    0 - 11  1 - 010   2 - 11   3 - 010
-        10                01       111
+        10      111       01               010
+    0 - 11  1 - 010   2 - 11   3 - 010 4 - 111
+        10                01       111     010
   */
   getTestArray(type) {
     switch (type) {
@@ -117,14 +156,50 @@ class TilingField extends GAInstance {
           { x: 2, y: 0 },
           { x: 1, y: -1 },
         ];
-      // case 4:
-      //   return [
-      //     { x: 0, y: 0 },
-      //     { x: 1, y: 0 },
-      //     { x: 2, y: 0 },
-      //     { x: 1, y: -1 },
-      //     { x: 1, y: 1 },
-      //   ];
+      case 4:
+        return [
+          { x: 0, y: 0 },
+          { x: 1, y: 0 },
+          { x: 2, y: 0 },
+          { x: 1, y: -1 },
+          { x: 1, y: 1 },
+        ];
+      case 5:
+        return [
+          { x: 0, y: 0 },
+          { x: 0, y: 1 },
+          { x: 1, y: 1 },
+        ];
+      case 6:
+        return [
+          { x: 0, y: 0 },
+          { x: 1, y: 0 },
+          { x: 0, y: 1 },
+        ];
+      case 7:
+        return [
+          { x: 0, y: 0 },
+          { x: 1, y: 0 },
+          { x: 1, y: -1 },
+        ];
+      case 8:
+        return [
+          { x: 0, y: 0 },
+          { x: 1, y: 0 },
+          { x: 1, y: 1 },
+        ];
+      case 9:
+        return [
+          { x: 0, y: 0 },
+          { x: 0, y: 1 },
+          { x: 0, y: 2 },
+        ];
+      case 10:
+        return [
+          { x: 0, y: 0 },
+          { x: 1, y: 0 },
+          { x: 2, y: 0 },
+        ];
     }
   }
 
@@ -132,19 +207,18 @@ class TilingField extends GAInstance {
     let string = "";
     let loaders = "";
     string += "\n";
-    this.recalculateField();
+    this.updateField();
     for (let i = 0; i < this.size; i++) {
       string += "\n";
       loaders += "\n";
       for (let j = 0; j < this.size; j++) {
         if ((this.fieldActive[i] & (1 << j)) != 0) {
-          if ((this.fieldLoaders[i] & (1 << j)) != 0){
-             loaders += "o";
-          }
-          else {
+          if ((this.fieldLoaders[i] & (1 << j)) != 0) {
+            loaders += "o";
+          } else {
             loaders += " ";
           }
-          if (this.isSet(j, i) && !this.isLoaderSet(j,i)) {
+          if (this.isSet(j, i) && !this.isLoaderSet(j, i)) {
             switch (this.getClipState(j, i)) {
               case 0:
                 string += "0";
@@ -159,8 +233,8 @@ class TilingField extends GAInstance {
                 string += "3";
                 break;
             }
-          } else if(this.isLoaderSet(j, i)){
-            string+='o';
+          } else if (this.isLoaderSet(j, i)) {
+            string += "o";
           } else string += " ";
         } else {
           string += "*";
@@ -188,6 +262,8 @@ class TilingField extends GAInstance {
 
   clone() {
     let clone = new TilingField(new Field(this.size));
+    clone.range_start = this.range_start;
+    clone.range_end = this.range_end;
     for (let i = 0; i < clone.size; i++) {
       clone.fieldState[i] = this.fieldState[i];
       clone.fieldActive[i] = this.fieldActive[i];
@@ -209,14 +285,16 @@ class TilingField extends GAInstance {
     for (let i = r; i < size; i += 8) {
       let x = Math.ceil(Math.random() * clone.size - 1);
       let y = Math.ceil(Math.random() * clone.size - 1);
-      let t = Math.ceil(Math.random() * 3);
+      let t = Math.ceil(
+        Math.random() * (this.range_end - this.range_start) + this.range_start
+      );
       clone.pool_A[i] = { x: x, y: y, type: t };
     }
     clone.changed = true;
     return clone;
   }
 
-  recalculateField() {
+  updateField() {
     let free = [];
     let size = this.size ** 2;
     for (let i = 0; i < this.size; i++) {
@@ -234,7 +312,7 @@ class TilingField extends GAInstance {
     for (let y = 0; y < this.size; y++) {
       for (let x = 0; x < this.size; x++) {
         if (this.isActive(x, y) && !this.isSet(x, y)) {
-          for (let type = 0; type < 4; type++) {
+          for (let type = this.range_start; type <= this.range_end; type++) {
             if (this.doesFit({ x: x, y: y, type: type })) {
               let fr = free.pop();
               if (fr) {
@@ -250,7 +328,7 @@ class TilingField extends GAInstance {
 
   score() {
     if (this.changed) {
-      this.recalculateField();
+      this.updateField();
       this.changed = false;
     } else {
       return this.cached_score;

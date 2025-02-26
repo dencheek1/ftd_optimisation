@@ -308,3 +308,7 @@ footer {
 .range * {
   margin:10px;
 }
+
+.button[active]{
+  background-color: #111;
+}
