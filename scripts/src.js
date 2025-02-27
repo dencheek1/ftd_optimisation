@@ -4,6 +4,7 @@ import { generateField } from './view.js';
 import Field from './field.js';
 import { GAInstance, GASearch } from './search.js';
 import TilingField from './tiling_field.js';
+import RNG from './rng.js';
 
 
 // generateField(new Field(4));
@@ -27,6 +28,17 @@ empty.updateField()
 console.log(empty)
 console.log(empty.toString())
 empty = GASearch.findSolution(empty,6)[0];
+console.log(RNG.rand_kiss() % 3)
+console.log(RNG.rand_kiss() % 3)
+console.log(RNG.rand_kiss() % 3)
+console.log(RNG.rand_kiss() % 3)
+console.log(RNG.rand_kiss() % 3)
+console.log(RNG.rand_kiss() % 3)
+console.log(RNG.rand_kiss() % 3)
+console.log(RNG.rand_kiss() % 3)
+console.log(RNG.rand_kiss() % 3)
+console.log(RNG.rand_kiss() % 3)
+console.log(RNG.rand_kiss() % 3)
 // console.log(empty.toString())
 // console.log(empty.score());
 // empty = empty.mutate();

@@ -1,4 +1,5 @@
 import Field from "./field.js";
+import RNG from "./rng.js";
 import { GASearch, GAInstance } from "./search.js";
 import TilingField from "./tiling_field.js";
 
@@ -168,6 +169,7 @@ function resetField() {
 
 //TODO make it look sain, only idiot could write this
 function searchField() {
+  RNG.seed_rand_kiss((new Date()).getMilliseconds());
   flag = !flag;
   document.getElementById("search").textContent = flag ? "stop" : "search";
 

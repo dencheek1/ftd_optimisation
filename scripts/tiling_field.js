@@ -1,5 +1,6 @@
 // import Field from "./field.js";
 import Field from "./field.js";
+import RNG from "./rng.js";
 import GAInstance from "./search.js";
 
 class TilingField extends GAInstance {
@@ -283,11 +284,11 @@ class TilingField extends GAInstance {
     let r = Math.ceil(Math.random() * 8);
     let size = this.size ** 2;
     for (let i = r; i < size; i += 8) {
-      let x = Math.ceil(Math.random() * clone.size - 1);
-      let y = Math.ceil(Math.random() * clone.size - 1);
-      let t = Math.ceil(
-        Math.random() * (this.range_end - this.range_start) + this.range_start
-      );
+      let x = RNG.rand_kiss() % clone.size;
+      let y = RNG.rand_kiss() % clone.size;
+      let t =
+        (RNG.rand_kiss() % (this.range_end - this.range_start + 1)) +
+        this.range_start;
       clone.pool_A[i] = { x: x, y: y, type: t };
     }
     clone.changed = true;

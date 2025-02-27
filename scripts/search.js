@@ -1,6 +1,7 @@
 "use strict";
 
 import Field from "./field.js";
+import RNG from "./rng.js";
 //TODO
 
 class GAInstance extends Field {
@@ -38,31 +39,31 @@ class GAInstance extends Field {
       clone.fieldState[i] = this.fieldState[i];
       clone.fieldActive[i] = this.fieldActive[i];
       clone.clipState[i * 2] = this.clipState[i * 2];
-      clone.clipState[(i * 2 )+ 1] = this.clipState[(i * 2) + 1];
+      clone.clipState[i * 2 + 1] = this.clipState[i * 2 + 1];
     }
     return clone;
   }
 
   mutate() {
     let clone = this.clone();
-    let x = Math.ceil(Math.random() * clone.size - 1);
-    let y = Math.ceil(Math.random() * clone.size - 1);
+    let x = RNG.rand_kiss() % clone.size;
+    let y = RNG.rand_kiss() % clone.size;
     let counter = 50;
     while (!clone.isActive(x, y) && counter > 0) {
-      x = Math.ceil(Math.random() * clone.size - 1);
-      y = Math.ceil(Math.random() * clone.size - 1);
+      x = RNG.rand_kiss() % clone.size;
+      y = RNG.rand_kiss() % clone.size;
       counter--;
     }
-    clone.setLoader(x, y, !this.isLoaderSet(x,y));
-    clone.setClipState(x + 1,y,1);
-    clone.setClipState(x - 1,y,3);
-    clone.setClipState(x,y + 1,2);
-    clone.setClipState(x,y - 1,0);
-    clone.setState(x + 1,y,true);
-    clone.setState(x - 1,y,true);
-    clone.setState(x,y + 1,true);
-    clone.setState(x,y - 1,true);
-    clone.setState(x,y,true);
+    clone.setLoader(x, y, !this.isLoaderSet(x, y));
+    clone.setClipState(x + 1, y, 1);
+    clone.setClipState(x - 1, y, 3);
+    clone.setClipState(x, y + 1, 2);
+    clone.setClipState(x, y - 1, 0);
+    clone.setState(x + 1, y, true);
+    clone.setState(x - 1, y, true);
+    clone.setState(x, y + 1, true);
+    clone.setState(x, y - 1, true);
+    clone.setState(x, y, true);
     // if(clone.hasSetNeighbor(x,y)){
     //   if(clone.isSet(x,y-1))
     //   clone.setClipState(x,y,0)
@@ -76,15 +77,14 @@ class GAInstance extends Field {
     return clone;
   }
 
-
   mutateClips() {
     let clone = this.clone();
-    let x = Math.ceil(Math.random() * clone.size - 1);
-    let y = Math.ceil(Math.random() * clone.size - 1);
+    let x = RNG.rand_kiss() % clone.size;
+    let y = RNG.rand_kiss() % clone.size;
     let counter = 50;
     while ((!clone.isActive(x, y) || clone.isSet(x, y)) && counter > 0) {
-      x = Math.ceil(Math.random() * clone.size - 1);
-      y = Math.ceil(Math.random() * clone.size - 1);
+      x = RNG.rand_kiss() % clone.size;
+      y = RNG.rand_kiss() % clone.size;
       counter--;
     }
     clone.setClipState(x, y, (Math.random() * 4) % 4);
@@ -92,7 +92,7 @@ class GAInstance extends Field {
   }
 
   score() {
-    if(this.changed){
+    if (this.changed) {
       this.updateField();
       this.changed = false;
     }
@@ -102,7 +102,7 @@ class GAInstance extends Field {
         if (this.isActive(x, y)) {
           if (this.isLoaderSet(x, y)) {
             score += 1;
-          } else if (this.isSet(x,y)) {
+          } else if (this.isSet(x, y)) {
             score += 2; // - temp;
           } else score -= 2;
         }
@@ -172,12 +172,11 @@ class GASearch {
   }
 
   static findSolution(instance, mutationRate) {
-
     let population = this.generatePopulation(instance);
     let size = population[0].size;
 
     console.time("solution cycle");
-    for (let i = size * size * 2 ; i > 0; i--) {
+    for (let i = size * size * 2; i > 0; i--) {
       population = this.step(population, mutationRate);
     }
     console.timeEnd("solution cycle");
